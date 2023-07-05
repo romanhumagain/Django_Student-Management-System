@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %} {% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+</head>
+{% block css %} {% endblock %}
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-lg-2 bg-body-tertiary position-fixed">
+        <nav class="navbar flex-column">
+          <div class="logo">
+            <span class="logo-symbol">S</span>
+            <span class="logo-text">chool</span>
+            <span class="logo-text">M</span>
+            <span class="logo-symbol">S</span>
+          </div>
+          <ul class="navbar-nav p-4" style="font-family: sans-serif;">
+
+            {% block dashboard %}  {% endblock %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="#" style="margin-top: 15px;">Notice</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="" style="margin-top: 15px;">Assignment</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" style="margin-top: 15px;">Grades</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" style="margin-top: 15px;">Attendance</a>
+            </li>
+            <a href="/student/signout/" class="btn btn-danger" style="margin-top: 250px;">Sign Out</a>
+          </ul>
+        </nav>
+      </div>
+      <div class="col-lg-10 offset-lg-2">
+        {% block body %}  {% endblock %}
+        <footer style="margin-top: 20px;">
+
+          <p>&copy; 2023 Student Management System</p>
+        </footer>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>

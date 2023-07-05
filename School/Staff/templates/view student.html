@@ -1,11 +1,233 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
-  <h1>Hello World</h1>
-</body>
-</html>
+{% extends 'base.html' %}
+ {% load static %} {% block title %}View Student {%endblock %}
+
+<link rel="stylesheet" href="{% static 'css/ViewStudent.css' %}" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+/>
+{% block css %}
+<style>
+  /* Style the search field */
+  form.example input[type="text"] {
+    padding: 10px;
+    font-size: 17px;
+    border: 1px solid grey;
+    float: left;
+    width: 80%;
+    background: #f1f1f1;
+  }
+
+  /* Style the submit button */
+  form.example button {
+    float: left;
+    width: 20%;
+    padding: 10px;
+    background: #080808;
+    color: white;
+    font-size: 17px;
+    border: 1px solid grey;
+    border-left: none;
+    /* Prevent double borders */
+    cursor: pointer;
+  }
+
+  form.example button:hover {
+    background: #393838;
+  }
+
+  /* Clear floats */
+  form.example::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+</style>
+
+{% endblock %} {% block search %}
+<form class="example">
+  <input type="text" placeholder="Search.." name="search" />
+  <button type="submit"><i class="fa fa-search"></i></button>
+</form>
+{% endblock %} {% block body %}
+<form>
+  <div class="d-flex justify-content-center m-1">
+    <button
+      type="submit"
+      name="action"
+      value="all"
+      class="btn btn-outline-danger me-2 "
+    >
+      All
+    </button>
+    <button
+      type="submit"
+      name="action"
+      value="bsc"
+      class="btn btn-outline-primary me-2"
+    >
+      BSC
+    </button>
+    <button
+      type="submit"
+      name="action"
+      value="bba"
+      class="btn btn-outline-success"
+    >
+      BBA
+    </button>
+  </div>
+</form>
+
+{% if not error_message %}
+<div class="container">
+  <table class="table table-striped table-hover shadow-lg m-4" style="font-size: small;">
+    <thead>
+      <tr>
+        <th scope="col" class="small">S.N</th>
+        <th scope="col" class="small">Name</th>
+        <th scope="col" class="small">Email</th>
+        <th scope="col" class="small">Address</th>
+        <th scope="col" class="small">D.O.B</th>
+        <th scope="col" class="small">Phone No</th>
+        <th scope="col" class="small">Intake</th>
+        <th scope="col" class="small">Level</th>
+        <th scope="col" class="small">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for data in querySet %}
+      <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{data.name}}</td>
+        <td>{{data.user.username}}</td>
+        <td>{{data.address}}</td>
+        <td>{{data.dob}}</td>
+        <td>{{data.phone_no}}</td>
+        <td>{{data.intake}}</td>
+        <td>{{data.level}}</td>
+        <td>
+          <a
+            href=""
+            class="btn btn-outline-danger send-email-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#mailModal"
+            data-email="{{ data.user.username }}"
+            >Send Email</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% if error_message %}
+<div class="alert alert-danger">{{error_message}}</div>
+{% endif %}
+<div
+  class="modal fade"
+  id="mailModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="mailModal"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="mailModal">Compose Email</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group m-2">
+              <label for="to">To:</label>
+              <input
+                type="email"
+                class="form-control"
+                id="to"
+                name="to"
+                required
+              />
+            </div>
+            <div class="form-group m-2">
+              <label for="inputSubject">Subject:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="inputSubject"
+                name="subject"
+                required
+              />
+            </div>
+            <div class="form-group m-2">
+              <label for="inputMessage">Message:</label>
+              <textarea
+                class="form-control"
+                id="inputMessage"
+                name="message"
+                rows="10"
+                style="height: 100px"
+                required
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label for="inputAttachments">Attachments:</label>
+              <input
+                type="file"
+                class="form-control-file"
+                id="inputAttachments"
+                name="attachment"
+                multiple
+              />
+            </div>
+            <hr />
+            <div class="form-group">
+              <button
+                type="submit"
+                name="action"
+                value="send"
+                class="btn btn-primary"
+              >
+                Send
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                data-bs-dismiss="modal"
+              >
+                Discard
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sendEmailButtons = document.querySelectorAll(".send-email-btn");
+    const emailInput = document.querySelector("#to");
+
+    sendEmailButtons.forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        const to = event.target.dataset.email;
+        emailInput.value = to;
+      });
+    });
+  });
+</script>
+
+{% endblock %}

@@ -19,6 +19,7 @@ def index(request):
         password = data.get('password')
 
         user = User.objects.filter(username = email)
+        
         if not user.exists():
             messages.error(request, "Invalid Email")
             return redirect('/')
@@ -28,7 +29,7 @@ def index(request):
         
         if authenticated_user is not None:
             login(request, authenticated_user)
-            return redirect('/staff/staff_dashboard/')
+            return redirect('student_dashboard' , authenticated_user.id)
         
         # Authentication failed
         if authenticated_user is None:

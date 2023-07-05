@@ -1,0 +1,77 @@
+{% extends 'child.html' %}
+{% load static %}
+{% block title %}Student Profile{% endblock %}
+
+{% block dashboard %} 
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
+            </li> {% endblock %}
+
+{% block body %}
+
+{% if messages %}
+  {% for message in messages %}
+  {% if message.tags == 'success' %}
+<div class="alert alert-success">{{message}}</div>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+
+<div class="container">
+  <div class="card">
+    <div class="card-header"> 
+      {% for student in student %}
+      <h2 style="text-align: center; background-color: cadetblue; padding: 9px;"> Welcome {{student.name}}</h2>
+      {% endfor %}
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="profile-picture">
+            <div class="profile-picture">
+              {% for student in student %}
+              {% if student.profile_pic %}
+               <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle" style="width: 200px; height: 200px;">
+               {% endif %}
+               {% if not student.profile_pic %}
+                <img src="{% static 'images/pp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2" style="width: 200px; height: 200px;">
+              {% endif %}
+            </div>
+            <form action="" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="mb-3">
+                <input class="form-control" type="file" id="profile_pic" name="profile_pic">
+              </div>
+              <button type="submit" name="action" value="profile_pic" class="btn btn-primary">
+                {% if not student.profile_pic %}
+                  Upload Profile Picture
+                  {% endif %}
+                  {% if  student.profile_pic %}
+                  Change Profile Picture
+                  {% endif %}
+              </button>
+            </form>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="profile-details">
+            {% for student in student %}
+            <p><strong>Student ID:</strong> {{student.student_id}}</p>
+            <p><strong>Email:</strong> {{student.user.username}}</p>
+            <p><strong>Phone:</strong> {{student.phone_no}}</p>
+            <p><strong>Address:</strong> {{student.address}}</p>
+            <p><strong>D.O.B:</strong> {{student.dob}}</p>
+            <p><strong>Course:</strong> {{student.course.course}}</p>
+            <p><strong>Level:</strong> {{student.level.level}}</p>
+            
+
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+{% endblock %}

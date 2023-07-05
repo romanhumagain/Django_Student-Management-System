@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block body %}
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'success' %}
+<div class="alert alert-success">{{message}}</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+<div class="container justify-content-center d-flex">
+  <div class="card me-lg-5 shadow-lg m-2" style="width: 18rem;">
+    <img src="{% static 'images/IT.jpg' %}" class="card-img-top" alt="bsc">
+    <div class="card-body">
+      <h5 class="card-title">BSC Hons</h5>
+      <p class="card-text">Explore the fascinating world of Information Technology with our comprehensive BSC Hons
+        program.</p>
+      <a href="#bsc-details" class="btn btn-primary">Course Details</a>
+    </div>
+  </div>
+
+  <div class="card shadow-lg m-2" style="width: 18rem;">
+    <img src="{% static 'images/BBA.jpeg' %}" class="card-img-top" alt="bba">
+    <div class="card-body">
+      <h5 class="card-title">BBA Hons</h5>
+      <p class="card-text">Develop strong business acumen and leadership skills with our esteemed BBA Hons degree.</p>
+      <a href="#bba-details" class="btn btn-primary">Course Details</a>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="container justify-content-center">
+  <div class="container justify-content-center">
+    <h2 id="bsc-details" style="text-align: center; background-color:rgb(85, 212, 212); padding: 9px;"> BSC Course Details</h2>
+    <div class="d-flex justify-content-center m3">
+      <button type="button" class="btn btn-outline-dark justify-content-center">
+        Number of students in BSC
+        <span class="badge text-bg-danger">{{ bbs_data.count }}</span>
+      </button>
+    </div>
+    <div class="d-flex justify-content-center m-2 mb-4">
+      <div class="btn-group">
+        <button type="button" class="btn btn-dark me-2">
+          Level 4
+          <span class="badge bg-danger">{{ bbs_data.bsc_l4 }}</span>
+        </button>
+        <button type="button" class="btn btn-dark me-2">
+          Level 5
+          <span class="badge bg-danger">{{ bbs_data.bsc_l5 }}</span>
+        </button>
+        <button type="button" class="btn btn-dark">
+          Level 6
+          <span class="badge bg-danger">{{ bbs_data.bsc_l6 }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form class=" container card shadow-lg p-3 justify-content-center" style="width: 400px; margin-top: 20px;"
+    method="post">
+    {% csrf_token %}
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="subject" name="subject" placeholder="name@example.com">
+      <label for="subject">Subject</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="code" name="code" placeholder="Password">
+      <label for="code">Subject Code</label>
+    </div>
+    <select class="form-select mb-2" aria-label="Default select example" name="level" id="level" required>
+      <option selected>Select Level</option>
+      <option value="Level 4">L-4</option>
+      <option value="Level 5">L-5</option>
+      <option value="Level 6">L-6</option>
+    </select>
+
+    <button type="submit" name="action" value="bsc" class=" btn btn-outline-primary">Add Course</button>
+
+  </form>
+
+  <!-- subject table for BSC -->
+  {% for level in levels %}
+  <h5 style="margin-top: 20px; background-color: cadetblue; padding: 9px;">{{ level }} - BSC</h5>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col" class="small">Subject</th>
+          <th scope="col" class="small">Subject Code</th>
+          <th scope="col" class="small">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subject in bsc_subjects %}
+        {% if subject.level.level == level %}
+        <tr>
+          <td class="small">{{ subject.sub_name }}</td>
+          <td class="small">{{ subject.sub_code }}</td>
+          <td class="small">
+            <a href="#" class="btn btn-outline-primary">Update</a>
+            <a href="#" class="btn btn-outline-danger">Delete</a>
+          </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+
+<hr>
+<div class="container">
+  <div class="container justify-content-center">
+    <h2 id="bba-details" style="text-align: center; background-color:rgb(85, 212, 212); padding: 9px;"> BBA Course Details</h2>
+    <div class="d-flex justify-content-center m3">
+      <button type="button" class="btn btn-outline-dark justify-content-center">
+        Number of students in BSC
+        <span class="badge text-bg-danger">{{ bba_data.count }}</span>
+      </button>
+    </div>
+    <div class="d-flex justify-content-center m-2 mb-4">
+      <div class="btn-group">
+        <button type="button" class="btn btn-dark me-2">
+          Level 4
+          <span class="badge bg-danger">{{ bba_data.bba_l4 }}</span>
+        </button>
+        <button type="button" class="btn btn-dark me-2">
+          Level 5
+          <span class="badge bg-danger">{{ bba_data.bba_l5 }}</span>
+        </button>
+        <button type="button" class="btn btn-dark">
+          Level 6
+          <span class="badge bg-danger">{{ bba_data.bba_l6 }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <form class=" container card shadow-lg p-3 justify-content-center" style="width: 400px; margin-top: 20px;"
+    method="post">
+    {% csrf_token %}
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="subject" name="subject" placeholder="name@example.com">
+      <label for="subject">Subject</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="code" name="code" placeholder="Password">
+      <label for="code">Subject Code</label>
+    </div>
+    <select class="form-select mb-2" aria-label="Default select example" name="level" id="level" required>
+      <option selected>Select Level</option>
+      <option value="Level 4">L-4</option>
+      <option value="Level 5">L-5</option>
+      <option value="Level 6">L-6</option>
+    </select>
+
+    <button type="submit" name="action" value="bba" class=" btn btn-outline-primary">Add Course</button>
+
+  </form>
+</div>
+
+<!-- HTML code for BSC and BBA details -->
+
+<script>
+  // Smooth scrolling to BSC Details section
+  $('a[href^="#bsc-details"]').on('click', function (event) {
+    var target = $(this.getAttribute('href'));
+    if (target.length) {
+      event.preventDefault();
+      $('html, body').stop().animate({
+        scrollTop: target.offset().top
+      }, 800);
+    }
+  });
+
+  // Smooth scrolling to BBA Details section
+  $('a[href^="#bba-details"]').on('click', function (event) {
+    var target = $(this.getAttribute('href'));
+    if (target.length) {
+      event.preventDefault();
+      $('html, body').stop().animate({
+        scrollTop: target.offset().top
+      }, 800);
+    }
+  });
+</script>
+
+
+{% endblock %}
