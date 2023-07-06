@@ -18,11 +18,21 @@
   {% endif %}
 
 <div class="container">
-  <div class="card">
+  <div class="card shadow-lg">
     <div class="card-header"> 
       {% for student in student %}
       <h2 style="text-align: center; background-color: cadetblue; padding: 9px;"> Welcome {{student.name}}</h2>
       {% endfor %}
+
+      {% if verification_error %}
+      <div class="alert alert-danger d-flex justify-content-between align-items-center">
+        <div>{{verification_error}}</div>
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="action" value="verify" class="btn btn-primary">Verify</button>
+        </form>
+      </div>
+      {% endif %}
     </div>
     <div class="card-body">
       <div class="row">
@@ -31,10 +41,10 @@
             <div class="profile-picture">
               {% for student in student %}
               {% if student.profile_pic %}
-               <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle" style="width: 200px; height: 200px;">
+               <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg" style="width: 200px; height: 200px;">
                {% endif %}
                {% if not student.profile_pic %}
-                <img src="{% static 'images/pp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2" style="width: 200px; height: 200px;">
+                <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2" style="width: 200px; height: 200px;">
               {% endif %}
             </div>
             <form action="" method="post" enctype="multipart/form-data">
@@ -50,7 +60,8 @@
                   Change Profile Picture
                   {% endif %}
               </button>
-            </form>
+              </form>
+              <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword">Change Password</button>
             {% endfor %}
           </div>
         </div>
@@ -74,4 +85,33 @@
     
   </div>
 </div>
+
+<!-- change password modal -->
+<!-- Modal -->
+<div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="modalChangePassword">Change Password</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post">
+          {% csrf_token %}
+        <div class="form-floating">
+          <input type="password" class="form-control" id="password" placeholder="Password">
+          <label for="password">Password</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" name="action" value="change_password" class="btn btn-primary">Change</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}

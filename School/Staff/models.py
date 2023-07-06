@@ -30,8 +30,8 @@ class Student(models.Model):
     return self.name
   
 class Profile(models.Model):
-  student = models.OneToOneField(Student ,null=True, on_delete=models.CASCADE )
-  token = models.CharField(max_length=200)
+  user = models.OneToOneField(User ,null=True, on_delete=models.CASCADE )
+  token = models.CharField(max_length=200 , unique=True)
   is_verified = models.BooleanField(default=False)
   
 

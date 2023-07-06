@@ -42,6 +42,8 @@ def student_registration(request):
     user.set_password(password)
     user.save()
     
+    profile = Profile.objects.create(user = user)
+    
     course = Course.objects.get(course = course)
     level = Level.objects.get(level = level)
     
