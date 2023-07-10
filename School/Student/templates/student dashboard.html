@@ -1,29 +1,43 @@
 {% extends 'child.html' %}
 {% load static %}
 {% block title %}Student Profile{% endblock %}
+<link rel="stylesheet" href="{% static 'css/std_dashboard.css' %}">
+{% block dashboard %}
+<li class="nav-item">
+  <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
+</li>
+<li class="nav-item d-flex align-items-center" style="position: relative;">
+  <a class="nav-link" href="#notice-details" style="margin-top: 15px;">Notice</a>
+  {% if notice_count > 0 %}
+  <span class="visually-hidden">Notice</span>
+  <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+    style="transform: translateY(-50%);margin-right: 23px; margin-top: 30px;">{{notice_count}}</span>
+  {% endif %}
+</li>
 
-{% block dashboard %} 
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
-            </li> {% endblock %}
+<li class="nav-item d-flex align-items-center" style="position: relative;">
+  <a class="nav-link" href="#assignment-details" style="margin-top: 15px;">Assignment</a>
+  {% if ass_count > 0 %}
+  <span class="visually-hidden">Assignment</span>
+  <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+    style="transform: translateY(-50%);margin-right: -24px; margin-top: 30px;">{{ass_count}}</span>
+  {% endif %}
+</li>
 
+{% endblock %}
 {% block body %}
-
 {% if messages %}
-  {% for message in messages %}
-  {% if message.tags == 'success' %}
+{% for message in messages %}
+{% if message.tags == 'success' %}
 <div class="alert alert-success">{{message}}</div>
-  {% endif %}
-  {% endfor %}
-  {% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
 
 <div class="container">
-  <div class="card shadow-lg">
-    <div class="card-header"> 
-      {% for student in student %}
+  <div class="card shadow-lg m-3">
+    <div class="card-header">
       <h2 style="text-align: center; background-color: cadetblue; padding: 9px;"> Welcome {{student.name}}</h2>
-      {% endfor %}
-
       {% if verification_error %}
       <div class="alert alert-danger d-flex justify-content-between align-items-center">
         <div>{{verification_error}}</div>
@@ -39,35 +53,35 @@
         <div class="col-md-4">
           <div class="profile-picture">
             <div class="profile-picture">
-              {% for student in student %}
               {% if student.profile_pic %}
-               <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg" style="width: 200px; height: 200px;">
-               {% endif %}
-               {% if not student.profile_pic %}
-                <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2" style="width: 200px; height: 200px;">
+              <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg m-2"
+                style="width: 200px; height: 200px;">
+              {% endif %}
+              {% if not student.profile_pic %}
+              <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2"
+                style="width: 200px; height: 200px;">
               {% endif %}
             </div>
             <form action="" method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="mb-3">
-                <input class="form-control" type="file" id="profile_pic" name="profile_pic">
+                <input class="form-control" type="file" id="profile_pic" name="profile_pic" required>
               </div>
               <button type="submit" name="action" value="profile_pic" class="btn btn-primary">
                 {% if not student.profile_pic %}
-                  Upload Profile Picture
-                  {% endif %}
-                  {% if  student.profile_pic %}
-                  Change Profile Picture
-                  {% endif %}
+                Upload Profile Picture
+                {% endif %}
+                {% if student.profile_pic %}
+                Change Profile Picture
+                {% endif %}
               </button>
-              </form>
-              <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword">Change Password</button>
-            {% endfor %}
+            </form>
+            <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword.">Change
+              Password</button>
           </div>
         </div>
         <div class="col-md-8">
           <div class="profile-details">
-            {% for student in student %}
             <p><strong>Student ID:</strong> {{student.student_id}}</p>
             <p><strong>Email:</strong> {{student.user.username}}</p>
             <p><strong>Phone:</strong> {{student.phone_no}}</p>
@@ -75,20 +89,17 @@
             <p><strong>D.O.B:</strong> {{student.dob}}</p>
             <p><strong>Course:</strong> {{student.course.course}}</p>
             <p><strong>Level:</strong> {{student.level.level}}</p>
-            
-
-            {% endfor %}
           </div>
         </div>
       </div>
     </div>
-    
   </div>
 </div>
 
 <!-- change password modal -->
 <!-- Modal -->
-<div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -98,20 +109,95 @@
       <div class="modal-body">
         <form method="post">
           {% csrf_token %}
-        <div class="form-floating">
-          <input type="password" class="form-control" id="password" placeholder="Password">
-          <label for="password">Password</label>
-        </div>
+          <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Password">
+            <label for="password">Password</label>
+          </div>
       </div>
       <div class="modal-footer">
         <button type="submit" name="action" value="change_password" class="btn btn-primary">Change</button>
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-        
       </div>
-    </form>
+      </form>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="container">
+  <div class="card mt-4  shadow justify-content-center" style="width: 700px; height: 200px; margin-left: 200px;">
+    <div class="card-header " style="background-color: cadetblue;">
+      <h3 id="notice-details">Recent Notices:</h3>
+    </div>
+    <div class="card-body">
+      <ul class="list-group">
+        {% for notice in notices %}
+        <li class="list-group-item d-flex justify-content-center align-items-center">
+          <span>{{ notice.notice }}.</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item">No notices posted yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+<hr>
+<div class="container">
+  <div class="row ">
+    <div class="col-md-6">
+      <div class="card mt-4" style="width: 700px; margin-left:205px ;">
+        <div class="card-header " style="background-color: cadetblue;">
+          <h2 id="assignment-details">Recent Assignments</h2>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for assignment in assignments %}
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-md-8">
+                  <p>{{ assignment.assignment }}</p>
+                </div>
+                <div class="col-md-3">
+                  <div class="assignment-details">
+                    <p class="due-date">Due Date:</p>
+                    <p class="date-time">{{assignment.due_date}} {{ assignment.due_time|time:"g:i A" }} </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item">No assignments posted yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<script>
+
+  // Smooth scrolling to BBA Details section
+  $('a[href^="#notice-details"]').on('click', function (event) {
+    var target = $(this.getAttribute('href'));
+    if (target.length) {
+      event.preventDefault();
+      $('html, body').stop().animate({
+        scrollTop: target.offset().top
+      }, 800);
+    }
+  });
+
+  $('a[href^="#assignment-details"]').on('click', function (event) {
+    var target = $(this.getAttribute('href'));
+    if (target.length) {
+      event.preventDefault();
+      $('html, body').stop().animate({
+        scrollTop: target.offset().top
+      }, 800);
+    }
+  });
+  
+</script>
 
 {% endblock %}

@@ -11,7 +11,18 @@ from django.db.models import Q
 # @login_required(login_url='/')
 def staff_dashboard(request):
   
-  return render(request, 'dashboard.html')
+  if request.method == 'POST':
+    data = request.POST
+    notice =data.get('notice')
+    
+    notice = Notice.objects.create(notice = notice)
+    
+  notice = Notice.objects.all()
+    
+  context = {'notices':notice}
+    
+  
+  return render(request, 'dashboard.html',context)
 
 # @login_required(login_url='/')
 def student_registration(request):
@@ -41,6 +52,8 @@ def student_registration(request):
     user = User.objects.create(username = email)
     user.set_password(password)
     user.save()
+    
+    userType = UserType.objects.create(user = user)
     
     profile = Profile.objects.create(user = user)
     
@@ -143,14 +156,36 @@ def course_details(request):
     
     messages.success(request , f"Successfully added {subject_name} subject")
     return redirect("/staff/course/")
-    
-    
       
-      
-    
-    
-    
-    
-    
-    
   return render(request , 'course.html' , context)
+
+def delete_notice(request , id):
+  notice = Notice.objects.filter(id = id)
+  notice.delete()
+  return redirect('/staff/staff_dashboard/')
+ 
+def assignment(request):
+  
+  if request.method == 'POST':
+    data = request.POST
+    
+    course = data.get('course')
+    level = data.get('level')
+    assignment = data.get('assignment')
+    due_date = data.get('date')
+    due_time = data.get('time')
+    
+    course = Course.objects.get(course = course)
+    level = Level.objects.get(level = level)
+    
+    assignment = Assignment.objects.create(course = course , level = level , assignment = assignment , due_date =due_date , due_time = due_time)
+    messages.success(request , 'successfully posted assignment')
+    return redirect('/staff/assignment/')
+  assignment = Assignment.objects.all()
+  context = {'assignments':assignment}
+  return render( request, 'assignment.html', context)
+
+def delete_assignment(request , id):
+  assignment = Assignment.objects.filter(id = id)
+  assignment.delete()
+  return redirect('/staff/assignment/')

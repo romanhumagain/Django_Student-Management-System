@@ -29,7 +29,14 @@ def index(request):
         
         if authenticated_user is not None:
             login(request, authenticated_user)
-            return redirect('student_dashboard' , authenticated_user.id)
+            try:
+                user_type = UserType.objects.get(user=authenticated_user).user_type
+                if user_type == 'student':
+                    return redirect('student_dashboard' , authenticated_user.id)
+                else:
+                    return redirect('/staff/staff_dashboard/')     
+            except:
+                 messages.error(request, "Invalid Account Access ")
         
         # Authentication failed
         if authenticated_user is None:

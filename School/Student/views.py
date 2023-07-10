@@ -11,13 +11,24 @@ from .utils import *
 import uuid
 
 def student_dashboard(request , uid ):
-  students = Student.objects.filter(user = uid)
-  context = {'student':students ,'uid':uid}
+  students = Student.objects.get(user = uid)
   
   user = User.objects.get(id = uid)
   profile = Profile.objects.get(user = user)
   
   is_verified = profile.is_verified
+  notice = Notice.objects.all()
+  notice_count = notice.count()
+  
+  level_id = students.level.id
+  course_id = students.course.id
+  
+  assignment = Assignment.objects.filter(course = course_id , level = level_id)
+  
+  ass_count = assignment.count()
+  context = {'student':students ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count}
+  
+  
   if not is_verified:
     context['verification_error'] = 'please verify your account'
   
@@ -54,6 +65,8 @@ def student_dashboard(request , uid ):
       send_verification(email , profile.token)
       messages.success(request , 'successfully sent verification link' )
       return redirect(f'/student/student_dashboard/{uid}')
+    
+    
  
   return render(request , 'student dashboard.html' , context)
 
@@ -71,5 +84,4 @@ def verify_account(request , token):
   except Exception as e:
     return HttpResponse('Sorry Couldnt Verify Your Account')
     print(str(e))
-  
   

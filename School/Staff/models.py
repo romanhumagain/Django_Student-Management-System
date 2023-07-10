@@ -1,6 +1,12 @@
+from datetime import timezone
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
+
+class UserType(models.Model):
+  user = models.OneToOneField(User, on_delete=models.CASCADE )
+  user_type = models.CharField(max_length=100 , default='student')
 
 class Course(models.Model):
   course = models.CharField(max_length=100 , unique=True)
@@ -40,6 +46,26 @@ class Subject(models.Model):
   level = models.ForeignKey(Level , on_delete=models.CASCADE)
   sub_name = models.CharField(max_length=100)
   sub_code = models.CharField(max_length=100)
+  
+  def __str__(self) -> str:
+    return self.sub_name
+  
+
+class Notice(models.Model):
+  notice = models.TextField(max_length=500)
+  
+  def __str__(self) -> str:
+    return self.notice
+  
+class Assignment(models.Model):
+  course = models.ForeignKey(Course, on_delete=models.CASCADE)
+  level = models.ForeignKey(Level, on_delete=models.CASCADE)
+  assignment = models.TextField(max_length=500)
+  due_date = models.DateField(auto_now=True)
+  due_time = models.TimeField(default=timezone.now)
+  
+  def __str__(self) -> str:
+    return self.assignment
   
   
   

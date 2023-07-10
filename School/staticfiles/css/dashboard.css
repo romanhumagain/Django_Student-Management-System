@@ -13,4 +13,21 @@
       border-radius: 50%;
       margin-right: 4px;
     }
-    
+    .card-body {
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
+  
+    .list-group {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+  
+    .list-group-item {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #ffffff;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+    }
