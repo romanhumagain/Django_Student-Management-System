@@ -67,5 +67,12 @@ class Assignment(models.Model):
   def __str__(self) -> str:
     return self.assignment
   
+class Attendance(models.Model):
+  student = models.ForeignKey(Student, on_delete=models.CASCADE)
+  date = models.DateField(auto_now=True)
+  attendance = models.CharField(max_length=100)
+
+  
+   
   
   

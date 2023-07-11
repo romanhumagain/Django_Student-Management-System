@@ -8,4 +8,5 @@ urlpatterns = [
   path('delete_notice/<int:id>/' , delete_notice , name='delete_notice'),
   path('assignment/', assignment , name='assignment' ),
   path('delete_assignment/<int:id>/' , delete_assignment , name='delete_assignment'),
+  path('attendance/', attendance , name='attendance' ),
 ]

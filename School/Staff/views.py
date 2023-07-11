@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from . utils import *
 import random , string
 from django.db.models import Q
+from datetime import date
 
 # Create your views here.
 # @login_required(login_url='/')
@@ -189,3 +190,46 @@ def delete_assignment(request , id):
   assignment = Assignment.objects.filter(id = id)
   assignment.delete()
   return redirect('/staff/assignment/')
+
+def attendance(request):
+    context = {}
+    current_date = date.today()
+    global course 
+    global level 
+    
+    if request.method == 'POST':
+      data = request.POST
+      action = data.get('action')
+      
+      if action == 'sort':
+            course = data.get('course')
+            level = data.get('level')
+            
+            course_inst = Course.objects.get(course=course)
+            level_inst = Level.objects.get(level=level)
+            
+            students = Student.objects.filter(course=course_inst, level=level_inst)
+            
+            if not students:
+                context['error_message'] = 'No students found'
+            context.update({'students': students})
+            
+      if action == 'attendance':
+        
+            course_inst = Course.objects.get(course=course)
+            level_inst = Level.objects.get(level=level)
+            
+            selected_attendance = request.POST.getlist('attendance[]')
+            presented_attendance=list(map(int, selected_attendance))
+            
+            all_students = Student.objects.filter(course=course_inst, level=level_inst)
+            
+            for student in all_students:
+                std_id = student.student_id
+                
+                if std_id in presented_attendance:
+                    attendance_status = 'Present'
+                else:
+                    attendance_status = 'Absent'
+                Attendance.objects.create(student=student, attendance=attendance_status, date=current_date)
+    return render(request, 'attendance.html', context)

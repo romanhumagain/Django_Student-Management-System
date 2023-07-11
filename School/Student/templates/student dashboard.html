@@ -11,16 +11,15 @@
   {% if notice_count > 0 %}
   <span class="visually-hidden">Notice</span>
   <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-    style="transform: translateY(-50%);margin-right: 23px; margin-top: 30px;">{{notice_count}}</span>
+    style="transform: translateY(-50%);margin-right: 20px; margin-top: 40px;">{{notice_count}}</span>
   {% endif %}
 </li>
-
 <li class="nav-item d-flex align-items-center" style="position: relative;">
   <a class="nav-link" href="#assignment-details" style="margin-top: 15px;">Assignment</a>
   {% if ass_count > 0 %}
   <span class="visually-hidden">Assignment</span>
   <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-    style="transform: translateY(-50%);margin-right: -24px; margin-top: 30px;">{{ass_count}}</span>
+    style="transform: translateY(-50%);margin-right: -29px; margin-top: 39px;">{{ass_count}}</span>
   {% endif %}
 </li>
 
@@ -58,7 +57,7 @@
                 style="width: 200px; height: 200px;">
               {% endif %}
               {% if not student.profile_pic %}
-              <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2"
+              <img src="{% static 'images/pp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2"
                 style="width: 200px; height: 200px;">
               {% endif %}
             </div>
