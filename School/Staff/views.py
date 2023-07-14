@@ -7,6 +7,7 @@ from . utils import *
 import random , string
 from django.db.models import Q
 from datetime import date
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 # @login_required(login_url='/')
@@ -14,15 +15,39 @@ def staff_dashboard(request):
   
   if request.method == 'POST':
     data = request.POST
-    notice =data.get('notice')
+    action = data.get('action')
     
-    notice = Notice.objects.create(notice = notice)
-    
-  notice = Notice.objects.all()
-    
-  context = {'notices':notice}
-    
+    if action == "post_notice":
+      notice =data.get('notice')
+      notice = Notice.objects.create(notice = notice)
   
+    # for searching attendance
+    if action == "search":
+      name = data.get('name')
+      date = data.get('date')
+      stdid = data.get('stdid')
+      
+      try:
+        student = Student.objects.get(student_id = stdid )
+      except ObjectDoesNotExist:
+          messages.error(request , "Student with student id-"+stdid+" doesn't exists" )
+          return redirect("/staff/staff_dashboard/")
+      try:  
+        attendance = Attendance.objects.get(student = student , date = date)
+      except ObjectDoesNotExist:
+          messages.error(request , "Attendance not taken on "+date )
+          return redirect("/staff/staff_dashboard/")
+      
+      attendance_status = attendance.attendance  
+      if attendance_status == "Present":
+          messages.success(request , name+" was Present on "+date )
+          return redirect('/staff/staff_dashboard/')
+      else:
+          messages.error(request , name+" was Absent on "+date )
+          return redirect('/staff/staff_dashboard/')
+        
+  notice = Notice.objects.all()
+  context = {'notices':notice}
   return render(request, 'dashboard.html',context)
 
 # @login_required(login_url='/')
@@ -202,6 +227,7 @@ def attendance(request):
       action = data.get('action')
       
       if action == 'sort':
+            current_date = date.today()
             course = data.get('course')
             level = data.get('level')
             
@@ -210,6 +236,13 @@ def attendance(request):
             
             students = Student.objects.filter(course=course_inst, level=level_inst)
             
+            for student in students:
+              attendance = Attendance.objects.filter(student = student , date = current_date)
+              if attendance:
+                messages.error(request , 'Attendance Already Taken !!')
+                return redirect('/staff/attendance/')
+              else:
+                break
             if not students:
                 context['error_message'] = 'No students found'
             context.update({'students': students})
@@ -232,4 +265,5 @@ def attendance(request):
                 else:
                     attendance_status = 'Absent'
                 Attendance.objects.create(student=student, attendance=attendance_status, date=current_date)
+                return redirect('/staff/attendance/')
     return render(request, 'attendance.html', context)

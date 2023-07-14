@@ -160,6 +160,10 @@ footer {
 {% if error_message %}
 <div class="alert alert-danger">{{error_message}}</div>
 {% endif %}
+
+{% if attendance_message %}
+<div class="alert alert-danger">{{attendance_message}}</div>
+{% endif %}
 <div
   class="modal fade"
   id="mailModal"
