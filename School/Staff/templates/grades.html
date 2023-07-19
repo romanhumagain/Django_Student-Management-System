@@ -1,0 +1,93 @@
+<!-- grades.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Grades Page{% endblock %}
+
+{% block css %}
+<style>
+ label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  select,
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container center" style="display: flex; align-items: center; justify-content: center;">
+  <form method="POST" action="{% url 'grades' %}" class="card p-4 shadow-lg m-2" style="max-width: 420px;">
+    {% csrf_token %}
+    <select id="exam" name="exam" required>
+      {% if not selected_exam %}
+      <option value="" disabled selected hidden>Exam Type</option>
+      {% endif %}
+      {% if selected_exam %}
+      <option value="{{selected_exam}}" selected>{{selected_exam}}</option>
+      {% endif %}
+      {% for exam_option in exam %}
+        <option value="{{ exam_option.exam }}">{{ exam_option.exam }}</option>
+      {% endfor %}
+    </select>
+    <div class="d-flex justify-content-center mb-1">
+      <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
+        {% if not level %}
+        <option selected>Select Level</option>
+        {% endif %}
+        {% if level %}
+        <option selected>{{level}}</option>
+        {% endif %}
+        <option value="Level 4">Level 4</option>
+        <option value="Level 5">Level 5</option>
+        <option value="Level 6">Level 6</option>
+      </select>
+      <button type="submit" name="action" value="bsc" class="btn btn-outline-primary me-2">
+        BSC
+      </button>
+      <button type="submit" name="action" value="bba" class="btn btn-outline-success">
+        BBA
+      </button>
+    </div>
+    <hr>
+    <label for="student">Select Student:</label>
+    <select id="student" name="student">
+      <option value="" disabled selected hidden>Select Student</option>
+      {% for student in students %}
+        <option value="{{ student.id }}">{{ student.name }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    {% for subject in subjects %}
+    <div class="d-flex">
+      <input type="text" name="subject" value="{{ subject.sub_name }}">
+      <i class="fas fa-chevron-right" style="margin-top: 12px;"></i>
+      <input type="text" id="subject{{subject.sub_name}}" name="subject{{subject.sub_name}}" placeholder="Marks" required>
+    </div>
+    {% endfor %}  
+    <br>
+    <button type="submit" name="action" value="submit" style="
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    ">Add Grades</button>
+  </form>
+</div>
+
+{% endblock %}

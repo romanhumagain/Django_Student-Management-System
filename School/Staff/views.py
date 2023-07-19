@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render , redirect
 from Staff.models import *
 from django.contrib import messages
@@ -8,6 +9,7 @@ import random , string
 from django.db.models import Q
 from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
+import uuid
 
 # Create your views here.
 # @login_required(login_url='/')
@@ -28,9 +30,9 @@ def staff_dashboard(request):
       stdid = data.get('stdid')
       
       try:
-        student = Student.objects.get(student_id = stdid )
+        student = Student.objects.get(student_id = stdid , name = name )
       except ObjectDoesNotExist:
-          messages.error(request , "Student with student id-"+stdid+" doesn't exists" )
+          messages.error(request , name +"with student id-"+stdid+" doesn't exists" )
           return redirect("/staff/staff_dashboard/")
       try:  
         attendance = Attendance.objects.get(student = student , date = date)
@@ -74,14 +76,13 @@ def student_registration(request):
     intake =data.get('intake')
     level = data.get('level')
     
-    
     user = User.objects.create(username = email)
     user.set_password(password)
     user.save()
     
     userType = UserType.objects.create(user = user)
     
-    profile = Profile.objects.create(user = user)
+    profile = Profile.objects.create(user = user , token = str(uuid.uuid4()))
     
     course = Course.objects.get(course = course)
     level = Level.objects.get(level = level)
@@ -117,14 +118,31 @@ def view_student(request):
     student = Student.objects.filter(course__course__icontains = 'BBA Hons').order_by('level__level') 
   
   search = request.GET.get('search')
+  
   if search:
     student = student.filter( Q(name__icontains = search)|
                               Q(level__level__icontains = search ))
-
   if not student:
     context['error_message'] = 'No result found !'
     
   context.update({'querySet':student})
+  
+  if request.method == "POST":
+    data = request.POST
+    action = data.get('action')
+    attachment = None
+    
+    if action == "send_email":
+      message = data.get('message')
+      subject = data.get('subject')
+      to_email = data.get('to')
+      
+      attachment = request.FILES.get('attachment')
+      
+      send_email(to_email, subject, message , attachment)
+      messages.success(request , "successfully sent email")
+      return redirect('/staff/view_student/')
+    
   return render(request , 'view student.html' , context)
 
 def course_details(request):
@@ -217,7 +235,12 @@ def delete_assignment(request , id):
   return redirect('/staff/assignment/')
 
 def attendance(request):
-    context = {}
+    current_date_and_time = datetime.datetime.now()
+    formatted_date_and_time = current_date_and_time.strftime("%Y-%m-%d %H:%M")
+
+    current_date_and_time = datetime.datetime.now()
+    context = {'current_date_and_time':formatted_date_and_time}
+    
     current_date = date.today()
     global course 
     global level 
@@ -256,14 +279,64 @@ def attendance(request):
             presented_attendance=list(map(int, selected_attendance))
             
             all_students = Student.objects.filter(course=course_inst, level=level_inst)
+            absent_student_email = []
             
             for student in all_students:
                 std_id = student.student_id
-                
+                user = student.user  
+                email = user.username  
                 if std_id in presented_attendance:
                     attendance_status = 'Present'
                 else:
+                    absent_student_email.append(email)
                     attendance_status = 'Absent'
+                    
                 Attendance.objects.create(student=student, attendance=attendance_status, date=current_date)
-                return redirect('/staff/attendance/')
+            if absent_student_email:
+              absent_mail(absent_student_email)
+            return redirect('/staff/attendance/')
     return render(request, 'attendance.html', context)
+  
+def grades(request):
+    exams = Examination.objects.all()
+    context = {'exam': exams}
+    
+    global selected_exam
+    global level
+    
+    if request.method == 'POST':
+        data = request.POST
+        selected_exam = data.get('exam')
+        level = data.get('level')
+        Std_name = data.get('student')
+        action = data.get('action')
+        course = ""
+        
+        context.update({"level":level , 'selected_exam':selected_exam})
+
+        if action == "bsc":
+            course = "BSC Hons"
+        elif action == "bba":
+            course = "BBA Hons"
+            
+        if action == 'submit':
+            exam = Examination.objects.get(exam = selected_exam)
+            student = Student.objects.get(id = Std_name)
+            subjects = Subject.objects.filter(level__level__contains="Level 4", course__course__contains=course)
+            marks_list = []
+            for subject in subjects:
+                marks = int(request.POST.get(f"subject{subject.sub_name}"))
+                subjectMarks = SubjectMarks.objects.create(student = student , subject = subject , exam = exam , marks = marks)
+                
+                marks_list.append(marks)
+
+            print(marks_list)
+          
+        students = Student.objects.filter(level__level__contains=level, course__course__contains=course)
+        subjects = Subject.objects.filter(level__level__contains=level, course__course__contains=course)
+        # Get the students who are not in SubjectMarks
+        students_not_in_marks = students.exclude(subjectmarks__isnull=False)
+
+        context.update({'students': students_not_in_marks, 'subjects': subjects})
+
+    return render(request, 'grades.html', context)

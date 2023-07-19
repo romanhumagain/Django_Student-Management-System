@@ -36,21 +36,10 @@ class Student(models.Model):
     return self.name
   
 class Profile(models.Model):
-  user = models.OneToOneField(User ,null=True, on_delete=models.CASCADE )
+  user = models.OneToOneField(User, null=True, on_delete=models.CASCADE )
   token = models.CharField(max_length=200 , unique=True)
   is_verified = models.BooleanField(default=False)
   
-
-class Subject(models.Model):
-  course = models.ForeignKey(Course , on_delete=models.CASCADE)
-  level = models.ForeignKey(Level , on_delete=models.CASCADE)
-  sub_name = models.CharField(max_length=100)
-  sub_code = models.CharField(max_length=100)
-  
-  def __str__(self) -> str:
-    return self.sub_name
-  
-
 class Notice(models.Model):
   notice = models.TextField(max_length=500)
   
@@ -72,7 +61,30 @@ class Attendance(models.Model):
   date = models.DateField(auto_now=True)
   attendance = models.CharField(max_length=100)
 
+class Subject(models.Model):
+  course = models.ForeignKey(Course , on_delete=models.CASCADE)
+  level = models.ForeignKey(Level , on_delete=models.CASCADE)
+  sub_name = models.CharField(max_length=100)
+  sub_code = models.CharField(max_length=100)
   
+  def __str__(self) -> str:
+    return self.sub_name
+  
+class Examination(models.Model):
+  exam = models.CharField(max_length=200)
+  
+  def __str__(self) -> str:
+    return self.exam
+  
+class SubjectMarks(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Examination, null=True, on_delete=models.CASCADE)
+    marks = models.IntegerField()
+
+    class Meta:
+        unique_together = ['student', 'subject']
+
    
   
   

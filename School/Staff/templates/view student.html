@@ -68,7 +68,7 @@ footer {
             <a class="nav-link" href="#">Grades</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Attendence</a>
+            <a class="nav-link" href="/staff/attendance/">Attendence</a>
           </li>
           
         </ul>
@@ -84,6 +84,13 @@ footer {
   </nav>
 
 <body>
+  {% if messages %}
+  {% for message in messages %}
+  {% if message.tags == 'success' %}
+<div class="alert alert-success">{{message}}</div>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
 <form>
   <div class="d-flex justify-content-center m-1">
     <button
@@ -161,9 +168,8 @@ footer {
 <div class="alert alert-danger">{{error_message}}</div>
 {% endif %}
 
-{% if attendance_message %}
-<div class="alert alert-danger">{{attendance_message}}</div>
-{% endif %}
+
+
 <div
   class="modal fade"
   id="mailModal"
@@ -234,7 +240,7 @@ footer {
               <button
                 type="submit"
                 name="action"
-                value="send"
+                value="send_email"
                 class="btn btn-primary"
               >
                 Send

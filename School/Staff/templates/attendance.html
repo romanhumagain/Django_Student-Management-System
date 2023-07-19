@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %} Attendence {% endblock %}
+
+<link rel="stylesheet" href="{% static 'css/attendance.css' %}">
 {% block body %}
+
 {% if messages %}
 {% for message in messages %} 
 {% if message.tags == "error" %}
@@ -13,7 +16,9 @@
   <form method="POST">
     {% csrf_token %}
         <h1 class="p-1" style="background-color: cadetblue; text-align: center;">Attendance Dashboard</h1>
-
+        <div class="date-time p-1 " style="background-color: #000000; color: white; margin-left: 1120px;">
+          {{ current_date_and_time}}
+      </div>
         <div class="card m-2 shadow-lg" style="width: 400px;">
             <div class="card-body">
                 <h5 class="card-title">Select Course</h5>
@@ -32,7 +37,6 @@
                 
             </div>
         </div>
-
         <div class="card m-2 shadow-lg" style="width: 400px;">
             <div class="card-body">
                 <h5 class="card-title">Select Class</h5>
