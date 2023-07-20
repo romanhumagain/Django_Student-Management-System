@@ -85,6 +85,12 @@ class SubjectMarks(models.Model):
     class Meta:
         unique_together = ['student', 'subject']
 
+class TotalMark(models.Model):
+  student = models.OneToOneField(Student , on_delete= models.CASCADE)
+  total_mark = models.IntegerField()
+  rank = models.IntegerField(null=True)
+  
+  
    
   
   

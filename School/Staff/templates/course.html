@@ -11,7 +11,7 @@
 {% endif %}
 <div class="container justify-content-center d-flex">
   <div class="card me-lg-5 shadow-lg m-2" style="width: 18rem;">
-    <img src="{% static 'images/IT.jpg' %}" class="card-img-top" alt="bsc">
+    <img src="{% static 'images/bba.jpg' %}" class="card-img-top" alt="bsc">
     <div class="card-body">
       <h5 class="card-title">BSC Hons</h5>
       <p class="card-text">Explore the fascinating world of Information Technology with our comprehensive BSC Hons
@@ -21,7 +21,7 @@
   </div>
 
   <div class="card shadow-lg m-2" style="width: 18rem;">
-    <img src="{% static 'images/BBA.jpeg' %}" class="card-img-top" alt="bba">
+    <img src="{% static 'images/bsc.jpg' %}" class="card-img-top" alt="bba">
     <div class="card-body">
       <h5 class="card-title">BBA Hons</h5>
       <p class="card-text">Develop strong business acumen and leadership skills with our esteemed BBA Hons degree.</p>
@@ -88,7 +88,7 @@
         <tr>
           <th scope="col" class="small">Subject</th>
           <th scope="col" class="small">Subject Code</th>
-          <th scope="col" class="small">Action</th>
+          <th scope="col" class="small">Core</th>
         </tr>
       </thead>
       <tbody>
@@ -97,10 +97,7 @@
         <tr>
           <td class="small">{{ subject.sub_name }}</td>
           <td class="small">{{ subject.sub_code }}</td>
-          <td class="small">
-            <a href="#" class="btn btn-outline-primary">Update</a>
-            <a href="#" class="btn btn-outline-danger">Delete</a>
-          </td>
+          <td class="small">30 Credits</td>
         </tr>
         {% endif %}
         {% endfor %}

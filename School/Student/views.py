@@ -7,6 +7,8 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from  Staff . models import *
 from .utils import *
+from django.db.models import Sum
+
 # Create your views here.
 import uuid
 
@@ -81,3 +83,24 @@ def verify_account(request , token):
     return HttpResponse('Sorry Couldnt Verify Your Account')
     print(str(e))
   
+def gradesheet(request , id):
+    user = User.objects.get(id = id)
+    
+    student = Student.objects.get(user = user)
+    course = student.course
+    level = student.level
+
+    subjectMarks = SubjectMarks.objects.filter(student=student)
+    sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
+
+    total_full_marks = sub_count * 100
+    total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']  # Get the total marks value from the aggregation
+
+    percentage = (total_marks / total_full_marks) * 100  # Calculate the percentage
+    print(percentage)
+    
+    totalMarkObj = TotalMark.objects.get(student = student)
+    context = {'student': student, 'subjectMarks': subjectMarks, 'total_marks': total_marks, 'percentage': percentage , 'totalMarkObj' :totalMarkObj , 'uid':id}
+
+    
+    return render(request , 'gradesheet.html' , context)

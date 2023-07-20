@@ -15,7 +15,6 @@ def send_password(email, password , intake):
     email.content_subtype = 'html'
     email.send()
 
-
 def absent_mail(absent_student_email):
     current_date = date.today()
     send_mail(
@@ -25,7 +24,6 @@ def absent_mail(absent_student_email):
         recipient_list=absent_student_email,
         fail_silently=False
     )
-    
     
 def send_email(to_email , subject , message , attachment):
     

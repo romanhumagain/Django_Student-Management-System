@@ -10,4 +10,6 @@ urlpatterns = [
   path('delete_assignment/<int:id>/' , delete_assignment , name='delete_assignment'),
   path('attendance/', attendance , name='attendance' ),
   path('grades/' , grades , name='grades'),
+  path('view_grades/' , view_grades , name='view_grades'),
+  path('view_marksheet/<int:id>/' , view_marksheet , name='view_marksheet'),
 ]

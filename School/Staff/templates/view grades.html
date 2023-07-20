@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% load static %}
+<!-- {% block css %}
+<style>
+label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+select,
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+</style>
+{% endblock %} -->
+
+{% block search %}
+<form class="d-flex" role="search" style="margin-left: 220px;" method="POST">
+  {% csrf_token %}
+  <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search"
+    {% if search_query %} value="{{ search_query }}" {% endif %}>
+  <button class="btn btn-outline-dark" type="submit">Search</button>
+</form>
+{% endblock %}
+
+{% block body %}
+<div class="container center" style="display: flex; align-items: center; justify-content: center;">
+  <form method="POST" class="card p-4 shadow-lg m-2" style="max-width: 420px;">
+    {% csrf_token %}
+    <select id="exam" name="exam" required>
+      {% if not selected_exam %}
+      <option value="" disabled selected hidden>Exam Type</option>
+      {% endif %}
+      {% if selected_exam %}
+      <option value="{{selected_exam}}" selected>{{selected_exam}}</option>
+      {% endif %}
+      {% for exam_option in exam %}
+        <option value="{{ exam_option.exam }}">{{ exam_option.exam }}</option>
+      {% endfor %}
+    </select>
+    <div class="d-flex justify-content-center mb-1">
+      <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
+        {% if not level %}
+        <option selected>Select Level</option>
+        {% endif %}
+        {% if level %}
+        <option selected>{{level}}</option>
+        {% endif %}
+        <option value="Level 4">Level 4</option>
+        <option value="Level 5">Level 5</option>
+        <option value="Level 6">Level 6</option>
+      </select>
+      <button type="submit" name="action" value="bsc hons" class="btn btn-outline-primary me-2">
+        BSC
+      </button>
+      <button type="submit" name="action" value="bba hons" class="btn btn-outline-success">
+        BBA
+      </button>
+    </div>
+    <hr>
+    
+  </form>
+</div>
+{% if students %}
+<div class="container">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">S.N</th>
+        <th scope="col">Name</th>
+        <th scope="col">Student ID</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for student in students %}
+      <tr>
+        <td>{{forloop.counter}}</td>
+        <td>{{student.name}}</td>
+        <td>{{student.student_id}}</td>
+        <td><a href="/staff/view_marksheet/{{student.id}}/">View Marks</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

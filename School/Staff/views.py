@@ -10,7 +10,7 @@ from django.db.models import Q
 from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
-
+from django.db.models import Sum , Q
 # Create your views here.
 # @login_required(login_url='/')
 def staff_dashboard(request):
@@ -32,7 +32,7 @@ def staff_dashboard(request):
       try:
         student = Student.objects.get(student_id = stdid , name = name )
       except ObjectDoesNotExist:
-          messages.error(request , name +"with student id-"+stdid+" doesn't exists" )
+          messages.error(request , name +" with student id-"+stdid+" doesn't exists" )
           return redirect("/staff/staff_dashboard/")
       try:  
         attendance = Attendance.objects.get(student = student , date = date)
@@ -318,7 +318,14 @@ def grades(request):
             course = "BSC Hons"
         elif action == "bba":
             course = "BBA Hons"
-            
+        
+        students = Student.objects.filter(level__level__contains=level, course__course__contains=course)
+        subjects = Subject.objects.filter(level__level__contains=level, course__course__contains=course)
+        # Get the students who are not in SubjectMarks
+        students_not_in_marks = students.exclude(subjectmarks__isnull=False)
+        
+        context.update({'students': students_not_in_marks, 'subjects': subjects})
+           
         if action == 'submit':
             exam = Examination.objects.get(exam = selected_exam)
             student = Student.objects.get(id = Std_name)
@@ -327,16 +334,97 @@ def grades(request):
             for subject in subjects:
                 marks = int(request.POST.get(f"subject{subject.sub_name}"))
                 subjectMarks = SubjectMarks.objects.create(student = student , subject = subject , exam = exam , marks = marks)
-                
                 marks_list.append(marks)
+                
+            total_marks = sum(marks_list)
+            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks)
 
-            print(marks_list)
-          
-        students = Student.objects.filter(level__level__contains=level, course__course__contains=course)
-        subjects = Subject.objects.filter(level__level__contains=level, course__course__contains=course)
-        # Get the students who are not in SubjectMarks
-        students_not_in_marks = students.exclude(subjectmarks__isnull=False)
-
-        context.update({'students': students_not_in_marks, 'subjects': subjects})
-
+            if not students_not_in_marks:
+              totalMarkObj = TotalMark.objects.all().order_by('-total_mark')
+              
+              previous_total_mark = None
+              previous_rank = 0
+              
+              for total_mark in totalMarkObj:
+                if total_mark.total_mark != previous_total_mark:
+                  rank = previous_rank+1
+                  previous_rank = rank
+                  
+                  total_mark.rank = rank
+                  total_mark.save()
+                  
+                  previous_total_mark = total_mark.total_mark
+                  
     return render(request, 'grades.html', context)
+
+def view_grades(request):
+    exams = Examination.objects.all()
+    context = {'exam': exams}
+
+    selected_exam = ""
+    level = ""
+    search_query = ""
+
+    students = Student.objects.all()
+    
+    # for student in students:
+    #     total_marks = SubjectMarks.objects.filter(student=student).aggregate(totalMarks=Sum('marks'))
+    #     existing_total_marks = TotalMark.objects.filter(student=student).exists()
+    #     print(total_marks['totalMarks'])
+        
+    #     if not existing_total_marks:
+    #         TotalMark.objects.create(student=student, total_mark=total_marks['totalMarks'])
+            
+    
+    if request.method == 'POST':
+        data = request.POST
+        selected_exam = data.get('exam')
+        level = data.get('level')
+        action = data.get('action')
+        search_query = data.get('search')
+        course = ""
+
+        context.update({'selected_exam': selected_exam ,"level":level})
+
+        if action == "bsc hons":
+            course = "BSC Hons"
+        elif action == "bba hons":
+            course = "BBA Hons"
+
+        students = Student.objects.all()
+
+        if level is not None:
+            students = students.filter(level__level__contains=level)
+
+        if course:
+            students = students.filter(course__course__contains=course)
+
+        if search_query:
+            students = students.filter(name__icontains=search_query)
+
+        context.update({'students': students})
+
+    context.update({'search_query': search_query})
+    return render(request, 'view grades.html', context)
+
+
+from django.db.models import Sum
+
+def view_marksheet(request, id):
+    student = Student.objects.get(id=id)
+    course = student.course
+    level = student.level
+
+    subjectMarks = SubjectMarks.objects.filter(student=student)
+    sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
+
+    total_full_marks = sub_count * 100
+    total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']  # Get the total marks value from the aggregation
+
+    percentage = (total_marks / total_full_marks) * 100  # Calculate the percentage
+    print(percentage)
+    
+    totalMarkObj = TotalMark.objects.get(student = student)
+    context = {'student': student, 'subjectMarks': subjectMarks, 'total_marks': total_marks, 'percentage': percentage , 'totalMarkObj' :totalMarkObj}
+
+    return render(request, 'marksheet.html', context)
