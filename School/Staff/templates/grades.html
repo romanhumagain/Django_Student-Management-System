@@ -34,7 +34,7 @@
       {% if selected_exam %}
       <option value="{{selected_exam}}" selected>{{selected_exam}}</option>
       {% endif %}
-      {% for exam_option in exam %}
+      {% for exam_option in exams %}
         <option value="{{ exam_option.exam }}">{{ exam_option.exam }}</option>
       {% endfor %}
     </select>

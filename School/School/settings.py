@@ -81,21 +81,21 @@ WSGI_APPLICATION = 'School.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-'''DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}'''
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'School_Management_db',
+        'NAME': 'student_db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',  
-        'PORT': '3306', 
+        'PORT': '3306',
     }
 }
 
@@ -161,3 +161,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'romanhmgn6999@gmail.com'
 EMAIL_HOST_PASSWORD = 'hrzvdgdqqqzuehjz'
 EMAIL_USE_TLS = True
+
+LOGIN_URL = '/'  # Replace '/login/' with your actual login URL.

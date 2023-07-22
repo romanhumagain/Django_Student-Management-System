@@ -1,144 +1,164 @@
 {% extends 'base.html' %}
-
-{% load static %}
-{% block title %} Marksheet {% endblock %}
-
+{% load static %} 
+{% block title %} Marksheet {%endblock %} 
 {% block css %}
-    <style>
-        /* Define CSS styles for the certificate */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+<style>
+    /* Define CSS styles for the certificate */
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            border: 1px solid #ccc;
-            padding: 20px;
-            background-color: #f2f2f2;
-        }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #f2f2f2;
+    }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 40px;
-            color: cadetblue;
-        }
+    h2 {
+        text-align: center;
+        margin-bottom: 40px;
+        color: cadetblue;
+    }
 
-        .certificate-details {
-            margin-bottom: 40px;
-        }
+    .certificate-details {
+        margin-bottom: 40px;
+    }
 
-        .student-name {
-            font-size: 24px;
-            /* font-weight: bold; */
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .student-name {
+        font-size: 24px;
+        /* font-weight: bold; */
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-        .course {
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
+    .course {
+        font-size: 18px;
+        text-align: center;
+        margin-bottom: 10px;
+    }
 
-        .date {
-            text-align: right;
-        }
+    .date {
+        text-align: right;
+    }
 
-        .signature {
-            width: 150px;
-            height: 50px;
-            margin-top: 40px;
-        }
+    .signature {
+        width: 150px;
+        height: 50px;
+        margin-top: 40px;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
 
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
 
-        th {
-            background-color: #f2f2f2;
-        }
-        .marks-details {
-            margin-top: 20px;
-        }
+    th {
+        background-color: #f2f2f2;
+    }
 
-        .marks-details p {
-            margin: 5px;
-        }
-        .student-info {
-            /* width: calc(100% - 120px); Adjust the width as needed */
-            float: left;
-            /* margin-left: 30px; */
-}
+    .marks-details {
+        margin-top: 20px;
+    }
 
-.profile-pic {
-    width: 100px;
-    float: right;
-}
+    .marks-details p {
+        margin: 5px;
+    }
 
-    </style>
-    {% endblock %}
+    .student-info {
+        /* width: calc(100% - 120px); Adjust the width as needed */
+        float: left;
+        /* margin-left: 30px; */
+    }
 
-    {% block body %}
+    .profile-pic {
+        width: 100px;
+        float: right;
+    }
+</style>
+{% endblock %}
+{% block body %}
+
+{% for exam in exams %}
+<h3 style="text-align: center; margin: 20px;">{{ exam.exam }}</h3>
+
 <div class="container">
-    <h2 style="font-weight: bold;">Marksheet</h2>
+    {% if totalMarkObj.exam == exam %}
+    <h2 style="font-weight: bold">Marksheet</h2>
 
     <div class="certificate-details">
         <div class="student-info">
-            <p class="student-name">This is to certify that <strong>Mr {{ student.name }}</strong> </p>
-            <p class="course">has successfully completed the Terminal Exam - {{ student.level.level }}</p>
+            <p class="student-name">
+                This is to certify that <strong>Mr {{ student.name }}</strong>
+            </p>
+            <p class="course">
+                has successfully completed the <strong>{{ exam.exam }}</strong> held on <strong>{{exam.date}}</strong>
+            </p>
         </div>
         <div class="profile-pic">
-            {% if  student.profile_pic %}
-            <img src="/media/{{ student.profile_pic }}" style="width: 100px; height: 100px;" alt="Profile Picture">
-            {% endif %}
-            {% if not student.profile_pic %}
-            <img src="{% static 'images/blankpp.jpg' %}"  style="width: 100px; height: 100px;" alt="Profile Picture">
+            {% if student.profile_pic %}
+                <img src="/media/{{ student.profile_pic }}" style="width: 100px; height: 100px" alt="Profile Picture" />
+            {% else %}
+                <img src="{% static 'images/blankpp.jpg' %}" style="width: 100px; height: 100px" alt="Profile Picture" />
             {% endif %}
         </div>
         <div style="clear: both;"></div>
     </div>
-    
+
     <table class="table table-striped">
         <thead>
-        <tr>
-            <th>Subject</th>
-            <th>Marks</th>
-            <th>Remarks</th>
-        </tr>
+            <tr>
+                <th>Subject</th>
+                <th>Marks</th>
+                <th>Remarks</th>
+            </tr>
         </thead>
         <tbody>
-        {% for subject_marks in subjectMarks %}
-            <tr>
-                <td>{{ subject_marks.subject.sub_name }}</td>
-                <td>{{ subject_marks.marks }}</td>
-                <td>
-                  {% if subject_marks.marks >= 40 %}
-                  <div style="color: rgb(11, 116, 130);">Pass</div>
-                  {% endif %}
-
-                  {% if subject_marks.marks < 40 %}
-                  <div style="color: red;">Fail *</div>
-                  {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
+            
+            {% for subject_marks in subjectMarks %}
+            {% if subject_marks.exam == exam %}
+                <tr>
+                    <td>{{ subject_marks.subject.sub_name }}</td>
+                    <td>{{ subject_marks.marks }}</td>
+                    <td>
+                        {% if subject_marks.marks >= 40 %}
+                            <div style="color: rgb(11, 116, 130)">Pass</div>
+                        {% else %}
+                            <div style="color: red">Fail *</div>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% endfor %}
         </tbody>
     </table>
 
-    <div class="marks-details" style="font-size: small; font-family: 'Times New Roman', Times, serif; margin-top: 50px;">
-      <p>Total Marks: <strong>{{ total_marks }}</strong></p>
-      <p>Percentage: <strong>{{ percentage|floatformat:3 }} %</strong></p>
-      <p>Rank: {{ totalMarkObj.rank }}</p>
-  </div>
+    <div class="marks-details" style="
+        font-size: small;
+        font-family: 'Times New Roman', Times, serif;
+        margin-top: 50px;
+    ">
+        
+        <p>Total Marks: <strong>{{ total_marks }}</strong></p>
+        <p>Percentage: <strong>{{ percentage|floatformat:1 }}%</strong></p>
+        <p>Rank: {{ totalMarkObj.rank }}</p>
+    </div>
+
+{% endif %}
+
+{% if totalMarkObj.exam != exam %}
+<div class="alert alert-danger">Result Not Published for {{exam.exam}} !!</div>
+{% endif %}
 </div>
+{% endfor %}
 {% endblock %}

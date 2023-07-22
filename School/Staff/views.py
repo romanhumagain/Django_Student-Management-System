@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 import datetime
 from django.shortcuts import render , redirect
 from Staff.models import *
@@ -11,8 +12,9 @@ from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from django.db.models import Sum , Q
-# Create your views here.
-# @login_required(login_url='/')
+
+
+@login_required(login_url="/")
 def staff_dashboard(request):
   
   if request.method == 'POST':
@@ -52,7 +54,7 @@ def staff_dashboard(request):
   context = {'notices':notice}
   return render(request, 'dashboard.html',context)
 
-# @login_required(login_url='/')
+@login_required(login_url='/')
 def student_registration(request):
   
   upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -77,10 +79,10 @@ def student_registration(request):
     level = data.get('level')
     
     user = User.objects.create(username = email)
-    user.set_password(password)
+    user.set_password("admin")
     user.save()
     
-    userType = UserType.objects.create(user = user)
+    userType = UserType.objects.create(user = user , user_type = "staff")
     
     profile = Profile.objects.create(user = user , token = str(uuid.uuid4()))
     
@@ -105,6 +107,7 @@ def student_registration(request):
   
   return render(request , 'registration.html')
 
+@login_required(login_url='/')
 def view_student(request):
   student = Student.objects.all().order_by('level__level')
   context = {}
@@ -145,6 +148,7 @@ def view_student(request):
     
   return render(request , 'view student.html' , context)
 
+@login_required(login_url='/')
 def course_details(request):
   
   bsc_count = Student.objects.filter(course__course = "BSC Hons").count()
@@ -203,11 +207,13 @@ def course_details(request):
       
   return render(request , 'course.html' , context)
 
+@login_required(login_url='/')
 def delete_notice(request , id):
   notice = Notice.objects.filter(id = id)
   notice.delete()
   return redirect('/staff/staff_dashboard/')
- 
+
+@login_required(login_url='/') 
 def assignment(request):
   
   if request.method == 'POST':
@@ -229,11 +235,13 @@ def assignment(request):
   context = {'assignments':assignment}
   return render( request, 'assignment.html', context)
 
+@login_required(login_url='/')
 def delete_assignment(request , id):
   assignment = Assignment.objects.filter(id = id)
   assignment.delete()
   return redirect('/staff/assignment/')
 
+@login_required(login_url='/')
 def attendance(request):
     current_date_and_time = datetime.datetime.now()
     formatted_date_and_time = current_date_and_time.strftime("%Y-%m-%d %H:%M")
@@ -297,9 +305,10 @@ def attendance(request):
             return redirect('/staff/attendance/')
     return render(request, 'attendance.html', context)
   
+@login_required(login_url='/')
 def grades(request):
-    exams = Examination.objects.all()
-    context = {'exam': exams}
+    exams = Examination.objects.all().order_by('-id')
+    context = {'exams': exams}
     
     global selected_exam
     global level
@@ -321,11 +330,11 @@ def grades(request):
         
         students = Student.objects.filter(level__level__contains=level, course__course__contains=course)
         subjects = Subject.objects.filter(level__level__contains=level, course__course__contains=course)
-        # Get the students who are not in SubjectMarks
-        students_not_in_marks = students.exclude(subjectmarks__isnull=False)
         
+        students_not_in_marks = students.exclude(subjectmarks__exam__exam__contains=selected_exam)
+             
         context.update({'students': students_not_in_marks, 'subjects': subjects})
-           
+            
         if action == 'submit':
             exam = Examination.objects.get(exam = selected_exam)
             student = Student.objects.get(id = Std_name)
@@ -337,7 +346,7 @@ def grades(request):
                 marks_list.append(marks)
                 
             total_marks = sum(marks_list)
-            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks)
+            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks , exam = exam)
 
             if not students_not_in_marks:
               totalMarkObj = TotalMark.objects.all().order_by('-total_mark')
@@ -357,24 +366,16 @@ def grades(request):
                   
     return render(request, 'grades.html', context)
 
+@login_required(login_url='/')
 def view_grades(request):
-    exams = Examination.objects.all()
-    context = {'exam': exams}
+    exams = Examination.objects.all().order_by('-id')
+    context = {'exams': exams}
 
     selected_exam = ""
     level = ""
     search_query = ""
 
     students = Student.objects.all()
-    
-    # for student in students:
-    #     total_marks = SubjectMarks.objects.filter(student=student).aggregate(totalMarks=Sum('marks'))
-    #     existing_total_marks = TotalMark.objects.filter(student=student).exists()
-    #     print(total_marks['totalMarks'])
-        
-    #     if not existing_total_marks:
-    #         TotalMark.objects.create(student=student, total_mark=total_marks['totalMarks'])
-            
     
     if request.method == 'POST':
         data = request.POST
@@ -407,24 +408,33 @@ def view_grades(request):
     context.update({'search_query': search_query})
     return render(request, 'view grades.html', context)
 
-
-from django.db.models import Sum
-
+@login_required(login_url='/')
 def view_marksheet(request, id):
-    student = Student.objects.get(id=id)
+    exams = Examination.objects.all().order_by('-id')
+    student = Student.objects.get(id=id)  # Get the selected student
     course = student.course
     level = student.level
-
-    subjectMarks = SubjectMarks.objects.filter(student=student)
-    sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
-
-    total_full_marks = sub_count * 100
-    total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']  # Get the total marks value from the aggregation
-
-    percentage = (total_marks / total_full_marks) * 100  # Calculate the percentage
-    print(percentage)
+    context = {'exams': exams, 'student': student}
     
-    totalMarkObj = TotalMark.objects.get(student = student)
-    context = {'student': student, 'subjectMarks': subjectMarks, 'total_marks': total_marks, 'percentage': percentage , 'totalMarkObj' :totalMarkObj}
+    try:
+        total_mark_objects = TotalMark.objects.filter(student=student)
+        total_marks = total_mark_objects.aggregate(Sum('total_mark'))['total_mark__sum']
+        sub_marks_list = SubjectMarks.objects.filter(student=student)
+        total_full_marks = sub_marks_list.count() * 100
 
+        if total_marks is not None:
+            percentage = (total_marks / total_full_marks) * 100
+            context['total_marks'] = total_marks
+            context['percentage'] = percentage
+            context['totalMarkObj'] = total_mark_objects.first()
+        else:
+            context['total_marks'] = 0
+            context['percentage'] = 0
+            context['totalMarkObj'] = None
+        
+        context['subjectMarks'] = sub_marks_list
+        
+    except SubjectMarks.DoesNotExist:
+        return HttpResponse("Result Not Published Yet")
+    
     return render(request, 'marksheet.html', context)

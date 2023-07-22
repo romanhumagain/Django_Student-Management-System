@@ -5,8 +5,8 @@ from django.contrib.auth.models import User
 # Create your models here.
 
 class UserType(models.Model):
-  user = models.OneToOneField(User, on_delete=models.CASCADE )
-  user_type = models.CharField(max_length=100 , default='student')
+  user = models.OneToOneField(User, on_delete=models.CASCADE)
+  user_type = models.CharField(max_length=100, default='student')
 
 class Course(models.Model):
   course = models.CharField(max_length=100 , unique=True)
@@ -15,7 +15,7 @@ class Course(models.Model):
     return self.course
   
 class Level(models.Model):
-  level = models.CharField(max_length=100)
+  level = models.CharField(max_length=100 ,unique=True )
   
   def __str__(self) -> str:
     return self.level
@@ -23,7 +23,7 @@ class Level(models.Model):
 class Student(models.Model):
   user = models.OneToOneField(User , on_delete=models.CASCADE , null=True)
   course = models.ForeignKey(Course , on_delete=models.CASCADE)
-  level = models.ForeignKey(Level, on_delete=models.CASCADE)
+  level = models.ForeignKey(Level, default=None, on_delete=models.CASCADE)
   student_id = models.IntegerField(unique=True)
   name = models.CharField(max_length=100)
   phone_no = models.CharField(max_length=20)
@@ -50,7 +50,7 @@ class Assignment(models.Model):
   course = models.ForeignKey(Course, on_delete=models.CASCADE)
   level = models.ForeignKey(Level, on_delete=models.CASCADE)
   assignment = models.TextField(max_length=500)
-  due_date = models.DateField(auto_now=True)
+  due_date = models.DateField(default=timezone.now)
   due_time = models.TimeField(default=timezone.now)
   
   def __str__(self) -> str:
@@ -72,6 +72,7 @@ class Subject(models.Model):
   
 class Examination(models.Model):
   exam = models.CharField(max_length=200)
+  date = models.CharField(max_length=200, null= True , default=None)
   
   def __str__(self) -> str:
     return self.exam
@@ -83,12 +84,18 @@ class SubjectMarks(models.Model):
     marks = models.IntegerField()
 
     class Meta:
-        unique_together = ['student', 'subject']
+        unique_together = ['student', 'subject', 'exam']
+
 
 class TotalMark(models.Model):
-  student = models.OneToOneField(Student , on_delete= models.CASCADE)
-  total_mark = models.IntegerField()
-  rank = models.IntegerField(null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, default=None, null=True)
+    exam = models.ForeignKey(Examination, on_delete=models.CASCADE, default=None, null=True)
+    total_mark = models.IntegerField(null=True, default=0)
+    rank = models.IntegerField(null=True, default=0)
+
+    class Meta:
+        unique_together = ['student', 'exam']
+
   
   
    

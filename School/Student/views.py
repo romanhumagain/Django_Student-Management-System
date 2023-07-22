@@ -9,9 +9,11 @@ from  Staff . models import *
 from .utils import *
 from django.db.models import Sum
 
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 import uuid
 
+@login_required(login_url='/')
 def student_dashboard(request , uid ):
   student = Student.objects.get(user = uid)
   
@@ -82,25 +84,51 @@ def verify_account(request , token):
   except Exception as e:
     return HttpResponse('Sorry Couldnt Verify Your Account')
     print(str(e))
-  
-def gradesheet(request , id):
-    user = User.objects.get(id = id)
     
-    student = Student.objects.get(user = user)
-    course = student.course
-    level = student.level
+def gradesheet(request, id):
+    try:
+        user = User.objects.get(id=id)
+        student = Student.objects.get(user=user)
+        exams = Examination.objects.all().order_by('-id') 
+        course = student.course
+        level = student.level
 
-    subjectMarks = SubjectMarks.objects.filter(student=student)
-    sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
+        subjectMarks = SubjectMarks.objects.filter(student=student)
+        sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
 
-    total_full_marks = sub_count * 100
-    total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']  # Get the total marks value from the aggregation
+        total_full_marks = sub_count * 100
 
-    percentage = (total_marks / total_full_marks) * 100  # Calculate the percentage
-    print(percentage)
-    
-    totalMarkObj = TotalMark.objects.get(student = student)
-    context = {'student': student, 'subjectMarks': subjectMarks, 'total_marks': total_marks, 'percentage': percentage , 'totalMarkObj' :totalMarkObj , 'uid':id}
+        try:
+            total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']
+            total_marks = total_marks or 0  # Ensure it's not None
+            percentage = (total_marks / total_full_marks) * 100
+        except (TypeError, KeyError):
+            return HttpResponse('Result Not Published Yet !!')
 
-    
-    return render(request , 'gradesheet.html' , context)
+        try:
+            totalMarkObj = TotalMark.objects.get(student=student)
+            rank = totalMarkObj.rank
+        except TotalMark.DoesNotExist:
+            totalMarkObj = None
+            rank = None
+
+        if rank is None:
+            return HttpResponse('Result Not Published Yet !!')
+
+        context = {
+            'student': student,
+            'subjectMarks': subjectMarks,
+            'total_marks': total_marks,
+            'percentage': percentage,
+            'totalMarkObj': totalMarkObj,
+            'uid': id,
+            'exams':exams,
+        }
+
+        return render(request, 'gradesheet.html', context)
+
+    except User.DoesNotExist:
+        return HttpResponse('User Not Found!')
+
+    except Student.DoesNotExist:
+        return HttpResponse('Student Not Found!')

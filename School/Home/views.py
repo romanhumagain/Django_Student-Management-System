@@ -33,7 +33,7 @@ def index(request):
                 user_type = UserType.objects.get(user=authenticated_user).user_type
                 if user_type == 'student':
                     return redirect('student_dashboard' , authenticated_user.id)
-                else:
+                elif user_type == 'staff':
                     return redirect('/staff/staff_dashboard/')     
             except:
                  messages.error(request, "Invalid Account Access ")
