@@ -9,6 +9,7 @@ from  Staff . models import *
 from .utils import *
 from django.db.models import Sum
 
+from datetime import datetime
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 import uuid
@@ -30,7 +31,17 @@ def student_dashboard(request , uid ):
   assignment = Assignment.objects.filter(course = course_id , level = level_id)
   
   ass_count = assignment.count()
-  context = {'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count}
+  
+  current_time = datetime.now().time()
+  greeting = ""
+  if current_time.hour < 12:
+        greeting = "Good Morning"
+  elif 12 <= current_time.hour < 18:
+        greeting = "Good Afternoon"
+  else:
+        greeting = "Good Evening"
+  
+  context = {'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count , 'greeting':greeting}
   
   
   if not is_verified:

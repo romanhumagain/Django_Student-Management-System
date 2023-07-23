@@ -2,6 +2,32 @@
 {% load static %}
 {% block title %}Student Profile{% endblock %}
 <link rel="stylesheet" href="{% static 'css/std_dashboard.css' %}">
+{% block css %}
+<style>
+  .btn:hover {
+    transform: scale(1.02);
+    transition: 0.6s;
+  }
+
+  .profile-picture img {
+    transition: 0.5s;
+  }
+
+  .profile-picture img:hover {
+    transform: scale(1.05);
+  }
+
+  .profile-details p {
+    transition: 0.5s;
+  }
+
+  .profile-details p:hover {
+    color: cadetblue;
+  }
+</style>
+
+{% endblock %}
+
 {% block dashboard %}
 <li class="nav-item">
   <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
@@ -33,10 +59,10 @@
 {% endfor %}
 {% endif %}
 
-<div class="container">
-  <div class="card shadow-lg m-3">
+<div class="container" >
+  <div class="card shadow-lg " style="width: 800px; margin-left: 120px; margin-top: 10px; ">
     <div class="card-header">
-      <h2 style="text-align: center; background-color: cadetblue; padding: 9px;"> Welcome {{student.name}}</h2>
+      <h4 class="text-center" style="background-color:#eca93c; color: white; padding: 9px;">{{greeting}}! {{student.name}}</h4>
       {% if verification_error %}
       <div class="alert alert-danger d-flex justify-content-between align-items-center">
         <div>{{verification_error}}</div>
@@ -49,39 +75,40 @@
     </div>
     <div class="card-body">
       <div class="row">
-        <div class="col-md-4">
-          <div class="profile-picture">
-            <div class="profile-picture">
-              {% if student.profile_pic %}
-              <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg m-2"
-                style="width: 200px; height: 200px;">
-              {% endif %}
-              {% if not student.profile_pic %}
-              <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle m-2"
-                style="width: 200px; height: 200px;">
-              {% endif %}
-            </div>
-            <form action="" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div class="mb-3">
-                <input class="form-control" type="file" id="profile_pic" name="profile_pic" required>
-              </div>
-              <button type="submit" name="action" value="profile_pic" class="btn btn-primary">
-                {% if not student.profile_pic %}
-                Upload Profile Picture
-                {% endif %}
-                {% if student.profile_pic %}
-                Change Profile Picture
-                {% endif %}
-              </button>
-            </form>
-            <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword.">Change
-              Password</button>
+        <div class="col-md-4 text-center">
+          <div class="profile-picture m-2">
+            {% if student.profile_pic %}
+            <img src="/media/{{student.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg"
+              style="width: 170px; height: 170px;">
+            {% else %}
+            <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle"
+              style="width: 200px; height: 200px;">
+            {% endif %}
           </div>
+          <div class="profile-details m-2">
+            <p><strong>ID:{{student.student_id}}</strong></p>
+          </div>
+          <form action="" method="post" enctype="multipart/form-data" style="font-size: 0.7rem;">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input class="form-control form-control-sm" type="file" id="profile_pic" name="profile_pic" required
+                style="font-size: xx-small;">
+            </div>
+            <button type="submit" name="action" value="profile_pic" class="btn btn-primary btn-sm">
+              {% if student.profile_pic %}
+              Change Profile Picture
+              {% else %}
+              Upload Profile Picture
+              {% endif %}
+            </button>
+          </form>
+
+          <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword."
+            hidden>Change
+            Password</button>
         </div>
         <div class="col-md-8">
-          <div class="profile-details">
-            <p><strong>Student ID:</strong> {{student.student_id}}</p>
+          <div class="profile-details ml-4">
             <p><strong>Email:</strong> {{student.user.username}}</p>
             <p><strong>Phone:</strong> {{student.phone_no}}</p>
             <p><strong>Address:</strong> {{student.address}}</p>
@@ -123,8 +150,8 @@
 </div>
 <hr>
 <div class="container">
-  <div class="card mt-4  shadow justify-content-center" style="width: 700px; height: 200px; margin-left: 200px;">
-    <div class="card-header " style="background-color: cadetblue;">
+  <div class="card mt-4  shadow justify-content-center" style="width: 700px; height: 200px; margin-left: 170px;">
+    <div class="card-header bg-secondary text-white">
       <h3 id="notice-details">Recent Notices:</h3>
     </div>
     <div class="card-body">
@@ -144,8 +171,8 @@
 <div class="container">
   <div class="row ">
     <div class="col-md-6">
-      <div class="card mt-4" style="width: 700px; margin-left:205px ;">
-        <div class="card-header " style="background-color: cadetblue;">
+      <div class="card mt-4" style="width: 700px; margin-left:175px ;">
+        <div class="card-header bg-secondary text-white">
           <h2 id="assignment-details">Recent Assignments</h2>
         </div>
         <div class="card-body">
@@ -196,7 +223,7 @@
       }, 800);
     }
   });
-  
+
 </script>
 
 {% endblock %}

@@ -426,7 +426,7 @@ def view_marksheet(request, id):
             percentage = (total_marks / total_full_marks) * 100
             context['total_marks'] = total_marks
             context['percentage'] = percentage
-            context['totalMarkObj'] = total_mark_objects.first()
+            context['totalMarkObj'] = total_mark_objects
         else:
             context['total_marks'] = 0
             context['percentage'] = 0
