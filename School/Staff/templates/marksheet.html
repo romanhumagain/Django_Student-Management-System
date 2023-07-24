@@ -89,11 +89,10 @@
 {% endblock %}
 {% block body %}
 
-{% for exam in exams %}
-<h3 style="text-align: center; margin: 20px;">{{ exam.exam }}</h3>
+{% for result in results %}
+<h3 style="text-align: center; margin: 20px;">{{ result.exam.exam }}</h3>
 
 <div class="container">
-    {% if totalMarkObj.exam == exam %}
     <h2 style="font-weight: bold">Marksheet</h2>
 
     <div class="certificate-details">
@@ -102,7 +101,7 @@
                 This is to certify that <strong>Mr {{ student.name }}</strong>
             </p>
             <p class="course">
-                has successfully completed the <strong>{{ exam.exam }}</strong> held on <strong>{{exam.date}}</strong>
+                has successfully completed the <strong>{{ result.exam.exam }}</strong> held on <strong>{{result.exam.date}}</strong>
             </p>
         </div>
         <div class="profile-pic">
@@ -125,8 +124,7 @@
         </thead>
         <tbody>
             
-            {% for subject_marks in subjectMarks %}
-            {% if subject_marks.exam == exam %}
+            {% for subject_marks in result.subjectMarks %}
                 <tr>
                     <td>{{ subject_marks.subject.sub_name }}</td>
                     <td>{{ subject_marks.marks }}</td>
@@ -138,7 +136,6 @@
                         {% endif %}
                     </td>
                 </tr>
-            {% endif %}
             {% endfor %}
         </tbody>
     </table>
@@ -149,16 +146,10 @@
         margin-top: 50px;
     ">
         
-        <p>Total Marks: <strong>{{ total_marks }}</strong></p>
+        <p>Total Marks: <strong>{{ result.total_marks }}</strong></p>
         <p>Percentage: <strong>{{ percentage|floatformat:1 }}%</strong></p>
-        <p>Rank: {{ totalMarkObj.rank }}</p>
+        <p>Rank: {{ result.rank }}</p>
     </div>
-
-{% endif %}
-
-{% if totalMarkObj.exam != exam %}
-<div class="alert alert-danger">Result Not Published for {{exam.exam}} !!</div>
-{% endif %}
 </div>
 {% endfor %}
 {% endblock %}

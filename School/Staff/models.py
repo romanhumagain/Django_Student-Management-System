@@ -25,7 +25,7 @@ class Student(models.Model):
   user = models.OneToOneField(User , on_delete=models.CASCADE , null=True)
   course = models.ForeignKey(Course , on_delete=models.CASCADE)
   level = models.ForeignKey(Level, default=None, on_delete=models.CASCADE)
-  slug = models.SlugField(unique=True)
+  # slug = models.SlugField(unique=True , null=True , default=None)
   student_id = models.IntegerField(unique=True)
   name = models.CharField(max_length=100)
   phone_no = models.CharField(max_length=20)
@@ -34,9 +34,9 @@ class Student(models.Model):
   intake = models.CharField(max_length=100)
   profile_pic = models.ImageField(upload_to='profile_pic', null=True)
   
-  def save(self ,*args , **kwargs):
-    self.slug = generate_slugs(self.name)
-    super(Student , self).save(*args , **kwargs)
+  # def save(self ,*args , **kwargs):
+  #   self.slug = generate_slugs(self.name)
+  #   super(Student , self).save(*args , **kwargs)
   
   def __str__(self):
     return self.name

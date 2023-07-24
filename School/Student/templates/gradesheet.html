@@ -135,79 +135,50 @@
             <li class="nav-item">
               <a class="nav-link" href="#" style="margin-top: 15px;">Attendance</a>
             </li>
-            <a href="/student/signout/" class="btn btn-danger" style="margin-top: 250px;">Sign Out</a>
+            <a href="/student/signout/" class="btn btn-danger" style="margin-top: 220px;">Sign Out</a>
           </ul>
         </nav>
       </div>
       <div class="col-lg-10 offset-lg-2">
         
-        {% for exam in exams %}
+        {% for result in results %}
+            <h3 class="m-2" style="text-align: center;">{{result.exam.exam}}</h3>
+            <div class="container">
+                <h2 style="font-weight: bold">Marksheet</h2>
 
-        <h3 class="m-2" style="text-align: center;">{{exam.exam}}</h3>
-        <div class="container">
-          {% if totalMarkObj.exam == exam %}
-          <h2 style="font-weight: bold">Marksheet</h2>
+                <!-- ... Your Student information code goes here ... -->
 
-          <div class="certificate-details">
-            <div class="student-info">
-              <p class="student-name">
-                This is to certify that <strong>Mr {{ student.name }}</strong>
-              </p>
-              <p class="course">
-                has successfully completed the Terminal Exam - {{ student.level.level }}
-              </p>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Marks</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject_mark in result.subjectMarks %}
+                            <tr>
+                                <td>{{ subject_mark.subject.sub_name }}</td>
+                                <td>{{ subject_mark.marks }}</td>
+                                <td>
+                                    {% if subject_mark.marks >= 40 %}
+                                        <div style="color: rgb(11, 116, 130)">Pass</div>
+                                    {% else %}
+                                        <div style="color: red">Fail</div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="marks-details" style="font-size: small; font-family: 'Times New Roman', Times, serif; margin-top: 50px;">
+                    <p>Total Marks: <strong>{{ result.total_marks }}</strong></p>
+                    <p>Percentage: <strong>{{ result.percentage|floatformat:1 }} %</strong></p>
+                    <p>Rank: <strong>{{ result.rank }}</strong></p>
+                </div>
             </div>
-            <div class="profile-pic">
-              {% if student.profile_pic %}
-              <img src="/media/{{ student.profile_pic }}" style="width: 100px; height: 100px" alt="Profile Picture" />
-              {% endif %} {% if not student.profile_pic %}
-              <img src="{% static 'images/blankpp.jpg' %}" style="width: 100px; height: 100px" alt="Profile Picture" />
-              {% endif %}
-            </div>
-            <div style="clear: both"></div>
-          </div>
-
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Marks</th>
-                <th>Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for subject_marks in subjectMarks %}
-              {% if subject_marks.exam == exam %}
-              <tr>
-                <td>{{ subject_marks.subject.sub_name }}</td>
-                <td>{{ subject_marks.marks }}</td>
-                <td>
-                  {% if subject_marks.marks >= 40 %}
-                  <div style="color: rgb(11, 116, 130)">Pass</div>
-                  {% endif %} {% if subject_marks.marks < 40 %} <div style="color: red">Fail *
-
-                    {% endif %}
-                </td>
-              </tr>
-              {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
-
-          <div class="marks-details" style="
-            font-size: small;
-            font-family: 'Times New Roman', Times, serif;
-            margin-top: 50px;
-          ">
-            <p>Total Marks: <strong>{{ total_marks }}</strong></p>
-            <p>Percentage: <strong>{{ percentage|floatformat:1 }} %</strong></p>
-            <p>Rank: <strong>{{ totalMarkObj.rank }}</strong></p>
-          </div>
-          {% endif %}
-          {% if totalMarkObj.exam != exam %}
-          <div class="alert alert-danger">Result Not Published for {{exam.exam}} !!</div>
-          {% endif %}
-        </div>
         {% endfor %}
       </div>
     </div>

@@ -262,6 +262,7 @@ def attendance(request):
             course = data.get('course')
             level = data.get('level')
             
+            
             course_inst = Course.objects.get(course=course)
             level_inst = Level.objects.get(level=level)
             
@@ -349,7 +350,7 @@ def grades(request):
             totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks , exam = exam)
 
             if not students_not_in_marks:
-              totalMarkObj = TotalMark.objects.all().order_by('-total_mark')
+              totalMarkObj = TotalMark.objects.filter(exam = exam).order_by('-total_mark')
               
               previous_total_mark = None
               previous_rank = 0
@@ -416,25 +417,31 @@ def view_marksheet(request, id):
     level = student.level
     context = {'exams': exams, 'student': student}
     
-    try:
-        total_mark_objects = TotalMark.objects.filter(student=student)
-        total_marks = total_mark_objects.aggregate(Sum('total_mark'))['total_mark__sum']
-        sub_marks_list = SubjectMarks.objects.filter(student=student)
-        total_full_marks = sub_marks_list.count() * 100
-
-        if total_marks is not None:
-            percentage = (total_marks / total_full_marks) * 100
-            context['total_marks'] = total_marks
-            context['percentage'] = percentage
-            context['totalMarkObj'] = total_mark_objects
-        else:
-            context['total_marks'] = 0
-            context['percentage'] = 0
-            context['totalMarkObj'] = None
-        
-        context['subjectMarks'] = sub_marks_list
-        
-    except SubjectMarks.DoesNotExist:
-        return HttpResponse("Result Not Published Yet")
+    totalMarkObject = TotalMark.objects.filter(student = student)
+    results = []
+    
+    for exam in exams:
+      subjectMarks = SubjectMarks.objects.filter(student = student , exam = exam)
+      sub_count = Subject.objects.filter(course__course = course , level__level = level).count()
+      total_full_marks = sub_count * 100
+      
+      totalMarks = TotalMark.objects.get(student =student , exam = exam)
+      total_marks = totalMarks.total_mark
+      
+      percentage = (total_marks / total_full_marks) * 100 if total_full_marks != 0 else 0
+      rank = totalMarks.rank if totalMarks else None
+      
+      results.append({
+        'exam':exam,
+        'subjectMarks':subjectMarks,
+        'total_marks':total_marks, 
+        'percentage':percentage,
+        'rank':rank
+      })
+      
+      context = {
+        'results':results,
+        'student':student,
+                 }
     
     return render(request, 'marksheet.html', context)

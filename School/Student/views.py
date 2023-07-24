@@ -104,36 +104,33 @@ def gradesheet(request, id):
         course = student.course
         level = student.level
 
-        subjectMarks = SubjectMarks.objects.filter(student=student)
-        sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
+        totalMarkObjects = TotalMark.objects.filter(student=student)
+        results = []
 
-        total_full_marks = sub_count * 100
+        for exam in exams:
+            subjectMarks = SubjectMarks.objects.filter(student=student, exam=exam)
+            sub_count = Subject.objects.filter(course__course=course, level__level=level).count()
 
-        try:
+            total_full_marks = sub_count * 100
             total_marks = subjectMarks.aggregate(total_marks=Sum('marks'))['total_marks']
-            total_marks = total_marks or 0  # Ensure it's not None
-            percentage = (total_marks / total_full_marks) * 100
-        except (TypeError, KeyError):
-            return HttpResponse('Result Not Published Yet !!')
+            total_marks = total_marks or 0
 
-        try:
-            totalMarkObj = TotalMark.objects.get(student=student)
-            rank = totalMarkObj.rank
-        except TotalMark.DoesNotExist:
-            totalMarkObj = None
-            rank = None
+            percentage = (total_marks / total_full_marks) * 100 if total_full_marks != 0 else 0
+            totalMarkObj = totalMarkObjects.filter(exam=exam).first()
+            rank = totalMarkObj.rank if totalMarkObj else None
 
-        if rank is None:
-            return HttpResponse('Result Not Published Yet !!')
+            results.append({
+                'exam': exam,
+                'subjectMarks': subjectMarks,
+                'total_marks': total_marks,
+                'percentage': percentage,
+                'rank': rank,
+            })
 
         context = {
             'student': student,
-            'subjectMarks': subjectMarks,
-            'total_marks': total_marks,
-            'percentage': percentage,
-            'totalMarkObj': totalMarkObj,
+            'results': results,
             'uid': id,
-            'exams':exams,
         }
 
         return render(request, 'gradesheet.html', context)
@@ -143,6 +140,7 @@ def gradesheet(request, id):
 
     except Student.DoesNotExist:
         return HttpResponse('Student Not Found!')
+
       
       
 def view_assignment(request , id):
