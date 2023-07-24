@@ -1,0 +1,56 @@
+{% extends 'child.html' %}
+
+{% block dashboard %} 
+<li class="nav-item">
+  <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
+</li>
+<li class="nav-item d-flex align-items-center" style="position: relative;">
+  <a class="nav-link" href="/student/student_dashboard/{{uid}}/" style="margin-top: 15px;">Notice</a>
+  {% if notice_count > 0 %}
+  <span class="visually-hidden">Notice</span>
+  <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+    style="transform: translateY(-50%);margin-right: 20px; margin-top: 40px;">{{notice_count}}</span>
+  {% endif %}
+</li>
+<li class="nav-item d-flex align-items-center" style="position: relative;">
+  <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px;">Assignment</a>
+  {% if ass_count > 0 %}
+  <span class="visually-hidden">Assignment</span>
+  <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+    style="transform: translateY(-50%);margin-right: -29px; margin-top: 39px;">{{ass_count}}</span>
+  {% endif %}
+</li>
+{% endblock %}
+
+{% block body %} <div class="container">
+  <div class="row ">
+    <div class="col-md-6">
+      <div class="card mt-4" style="width: 700px; margin-left:175px ;">
+        <div class="card-header bg-secondary text-white">
+          <h2 id="assignment-details">Recent Assignments</h2>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for assignment in assignments %}
+            <li class="list-group-item">
+              <div class="row">
+                <div class="col-md-8">
+                  <p>{{ assignment.assignment }}</p>
+                </div>
+                <div class="col-md-3">
+                  <div class="assignment-details">
+                    <p class="due-date">Due Date:</p>
+                    <p class="date-time">{{assignment.due_date}} {{ assignment.due_time|time:"g:i A" }} </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {% empty %}
+            <li class="list-group-item">No assignments posted yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> {% endblock%}

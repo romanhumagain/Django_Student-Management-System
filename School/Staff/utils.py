@@ -1,6 +1,8 @@
 from django.core.mail import EmailMultiAlternatives ,send_mail
 from datetime import date
 from django.conf import settings
+from django.utils.text import slugify
+import uuid
 
 def send_password(email, password , intake):
     message = f"Email: <strong>{email}</strong> <br/>Password: <strong>{password}</strong> <br/> Please use this email and password to access your account. You can also change your password from your profile section."
@@ -40,6 +42,13 @@ def send_email(to_email , subject , message , attachment):
     email.content_subtype = 'html'
     email.send()
    
+def generate_slugs(title:str) ->str:
+    from . models import Student
+    title = slugify(title)
    
+    while(Student.objects.filter(slug = title)).exists():
+        title = f'{slugify(title)}-{str(uuid.uuid4())[:4]}'
+        
+    return title
     
 

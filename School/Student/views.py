@@ -25,8 +25,8 @@ def student_dashboard(request , uid ):
   notice = Notice.objects.all()
   notice_count = notice.count()
   
-  level_id = student.level.id
-  course_id = student.course.id
+  level_id = student.level
+  course_id = student.course
   
   assignment = Assignment.objects.filter(course = course_id , level = level_id)
   
@@ -143,3 +143,17 @@ def gradesheet(request, id):
 
     except Student.DoesNotExist:
         return HttpResponse('Student Not Found!')
+      
+      
+def view_assignment(request , id):
+  
+  user = User.objects.get(id= id)
+  student = Student.objects.get(user = user)
+  
+  level_id = student.level
+  course_id = student.course
+  
+  assignment = Assignment.objects.filter(course = course_id , level = level_id)
+  
+  context = {'student':student ,'uid':id ,'assignments':assignment }
+  return render(request , 'std_assignment.html' , context)

@@ -5,4 +5,5 @@ urlpatterns = [
   path('signout/' , sign_out , name='signout'),
   path('verify_account/<str:token>/' , verify_account , name='verify_account'),
   path('gradesheet/<int:id>/' , gradesheet , name="gradesheet"),
+  path('std_assignment/<int:id>/' , view_assignment , name='std_assignment'),
 ]

@@ -122,7 +122,7 @@
               {% endif %}
             </li>
             <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="/student/student_dashboard/{{uid}}/" style="margin-top: 15px;">Assignment</a>
+              <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px;">Assignment</a>
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
               <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
