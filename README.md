@@ -18,5 +18,5 @@
 
   <li><b>Email Verification:</b> To ensure the authenticity of the users, our system incorporates an email verification mechanism during the account creation process. When a new student verify there account, a verification link is sent to their registered email address. By clicking on this link, the student confirms the validity of their email address, and their account is activated.</li>
 
-  <li><b>Notice Board:</b> Our system also includes a digital notice board feature. This allows administrators to post important announcements or updates. Students can check this notice board to stay informed about upcoming events, changes to the schedule, or other pertinent information.</li>
+  <li><b>Notice Board:</b> This system also includes a digital notice board feature. This allows administrators to post important announcements or updates. Students can check this notice board to stay informed about upcoming events, changes to the schedule, or other pertinent information.</li>
 </ul>
