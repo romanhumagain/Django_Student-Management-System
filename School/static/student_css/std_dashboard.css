@@ -1,0 +1,53 @@
+.logo {
+  /* margin-left: 10px; */
+  width: 75px;
+  height: 75px;
+  background-color: #f06292;
+
+  /* Set your desired background color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #0c0c0c;
+  /* Set your desired text color */
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo-highlight {
+  color: #0cd0cd;
+  margin-left: 4px;
+  /* Set your desired highlight color */
+}
+.btn:hover {
+  transform: scale(1.02);
+  transition: 0.6s;
+}
+
+.profile-picture img {
+  transition: 0.5s;
+}
+
+.profile-picture img:hover {
+  transform: scale(1.05);
+}
+
+.profile-details p {
+  transition: 0.5s;
+}
+
+.profile-details p:hover {
+  color: cadetblue;
+}
+footer{
+  margin-top: 20px;
+  color:#635d5d;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  background-color: white; 
+}

@@ -1,83 +1,79 @@
 {% extends 'base.html' %}
 {% load static %}
 
-  {% block title %}Student Registration Form {% endblock %}
-  <link rel="stylesheet" href="{% static 'css/registration.css' %}">
-
-  
-  {% block body %}
-
-
-  {% if messages %}
-  {% for message in messages %}
-  {% if message.tags == 'success' %}
+{% block title %}Student Registration Form {% endblock %}
+<link rel="stylesheet" href="{% static 'css/registration.css' %}">
+{% block body %}
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'success' %}
 <div class="alert alert-success">{{message}}</div>
-  {% endif %}
-  {% endfor %}
-  {% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
 <h2 class="p-2" style="background-color: cadetblue; text-align: center;">Student Registration Form</h2>
-  <div class="container center" style="display: flex;  align-items: center; justify-content: center;">
-    <form class="card shadow-lg p-4 m-4 " style="width: 500px;" method="post">
-      {% csrf_token %}
-      <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="name" name="name" placeholder="name"  required>
-        <label for="name">Name</label>
-      </div>
-      <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com" required>
-        <label for="floatingInput">Email address</label>
-      </div>
-      <div class="form-floating mb-3">
-        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required >
-        <label for="phone">Phone</label>
-      </div>
-      <div class="form-floating mb-3">
-        <input type="date" class="form-control" id="dob" name="dob" placeholder="dob" required>
-        <label for="dob">Date of Birth</label>
-      </div>
-      <div class="form-floating mb-3">
-        <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address" required ></textarea>
-        <label for="address">Address</label>
-      </div>
-      
-      <select class="form-select mb-2" aria-label="Default select example" name="level" id="level" >
-        <option selected>Level</option>
-        <option value="Level 4">Level 4</option>
-        <option value="Level 5">Level 5</option>
-        <option value="Level 6">Level 6</option>
-      </select>
+<div class="container center" style="display: flex;  align-items: center; justify-content: center;">
+  <form class="card shadow-lg p-4 m-4 " style="width: 500px;" method="post">
+    {% csrf_token %}
+    <div class="form-floating mb-3">
+      <input type="text" class="form-control" id="name" name="name" placeholder="name" required>
+      <label for="name">Name</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com" required>
+      <label for="floatingInput">Email address</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
+      <label for="phone">Phone</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input type="date" class="form-control" id="dob" name="dob" placeholder="dob" required>
+      <label for="dob">Date of Birth</label>
+    </div>
+    <div class="form-floating mb-3">
+      <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address" required></textarea>
+      <label for="address">Address</label>
+    </div>
 
-      <div class="form-group m-2">
-        <label for="course">Course:</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="course" id="bsc" value="BSC Hons" >
-          <label class="form-check-label" for="bsc">
-            BSC Hons
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="course" id="bba" value="BBA Hons" >
-          <label class="form-check-label" for="bba">
-            BBA Hons
-          </label>
-        </div>
+    <select class="form-select mb-2" aria-label="Default select example" name="level" id="level">
+      <option selected>Level</option>
+      <option value="Level 4">Level 4</option>
+      <option value="Level 5">Level 5</option>
+      <option value="Level 6">Level 6</option>
+    </select>
+
+    <div class="form-group m-2">
+      <label for="course">Course:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="course" id="bsc" value="BSC Hons">
+        <label class="form-check-label" for="bsc">
+          BSC Hons
+        </label>
       </div>
-      <div class="form-group m-2">
-        <label for="course">Intake:</label>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="intake" id="spring" value="Spring Intake" >
-          <label class="form-check-label" for="spring">
-            Spring
-          </label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="intake" id="autumn" value="Autumn Intake" >
-          <label class="form-check-label" for="autumn">
-            Autumn
-          </label>
-        </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="course" id="bba" value="BBA Hons">
+        <label class="form-check-label" for="bba">
+          BBA Hons
+        </label>
       </div>
-      <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-  </div>
+    </div>
+    <div class="form-group m-2">
+      <label for="course">Intake:</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="intake" id="spring" value="Spring Intake">
+        <label class="form-check-label" for="spring">
+          Spring
+        </label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="intake" id="autumn" value="Autumn Intake">
+        <label class="form-check-label" for="autumn">
+          Autumn
+        </label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+  </form>
+</div>
 {% endblock %}

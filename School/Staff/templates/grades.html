@@ -1,28 +1,7 @@
-
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Grades Page{% endblock %}
-
-{% block css %}
-<style>
- label {
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  select,
-  input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 15px;
-    font-size: 16px;
-  }
-</style>
-{% endblock %}
-
+<link rel="stylesheet" href="{% static 'staff_css/grades.css' %}">
 {% block body %}
 <div class="container center" style="display: flex; align-items: center; justify-content: center;">
   <form method="POST" action="{% url 'grades' %}" class="card p-4 shadow-lg m-2" style="max-width: 420px;">
@@ -88,5 +67,4 @@
     ">Add Grades</button>
   </form>
 </div>
-
 {% endblock %}

@@ -1,17 +1,23 @@
-{% extends 'base.html' %}
-{% load static %} 
-{% block title %} Marksheet {%endblock %} 
-{% block css %}
-<style>
-    /* Define CSS styles for the certificate */
-    body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-    }
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marksheet</title>
+
+    <link rel="stylesheet" href="{% static 'staff_css/marksheet.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+</head>
+<style>
     .container {
         max-width: 800px;
-        margin: 0 auto;
+        /* margin: 0 auto; */
         border: 1px solid #ccc;
         padding: 20px;
         background-color: #f2f2f2;
@@ -22,134 +28,146 @@
         margin-bottom: 40px;
         color: cadetblue;
     }
-
-    .certificate-details {
-        margin-bottom: 40px;
-    }
-
-    .student-name {
-        font-size: 24px;
-        /* font-weight: bold; */
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .course {
-        font-size: 18px;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
-    .date {
-        text-align: right;
-    }
-
-    .signature {
-        width: 150px;
-        height: 50px;
-        margin-top: 40px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
-
-    th,
-    td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f2f2f2;
-    }
-
-    .marks-details {
-        margin-top: 20px;
-    }
-
-    .marks-details p {
-        margin: 5px;
-    }
-
-    .student-info {
-        /* width: calc(100% - 120px); Adjust the width as needed */
-        float: left;
-        /* margin-left: 30px; */
-    }
-
-    .profile-pic {
-        width: 100px;
-        float: right;
-    }
 </style>
-{% endblock %}
-{% block body %}
 
-{% for result in results %}
-<h3 style="text-align: center; margin: 20px;">{{ result.exam.exam }}</h3>
+<body>
 
-<div class="container">
-    <h2 style="font-weight: bold">Marksheet</h2>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <div class="logo">
+                <span class="logo-text">My<span class="logo-highlight">School</span></span>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="margin-left: 40px;">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/staff/staff_dashboard"
+                            style="margin-left: 50px;">Dashboard</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Students
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'student_registration' %}">Register Students</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'view_student' %}">View Students</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="{% url 'course' %}">Course</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="{% url 'assignment' %}">Assignment</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Grades
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'grades' %}">Add Grades</a></li>
+                            <li><a class="dropdown-item" href="{% url 'view_grades' %}">View Grades</a></li>
+                        </ul>
+                    </li>
 
-    <div class="certificate-details">
-        <div class="student-info">
-            <p class="student-name">
-                This is to certify that <strong>Mr {{ student.name }}</strong>
-            </p>
-            <p class="course">
-                has successfully completed the <strong>{{ result.exam.exam }}</strong> held on <strong>{{result.exam.date}}</strong>
-            </p>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/staff/attendance/">Attendence</a>
+                    </li>
+                    <form class="d-flex" role="search" style="margin-left: 220px;" method="POST">
+                        {% csrf_token %}
+                        <input class="form-control me-2" type="search" name="search" placeholder="Search"
+                            aria-label="Search" {% if search_query %} value="{{ search_query }}" {% endif %}>
+                        <button class="btn btn-outline-dark" type="submit">Search</button>
+                    </form>
+                </ul>
+            </div>
         </div>
-        <div class="profile-pic">
-            {% if student.profile_pic %}
+    </nav>
+
+    {% for result in results %}
+    <h3 style="text-align: center; margin: 20px;">{{ result.exam.exam }}</h3>
+
+    <div class="container">
+        {% if result.rank != None %}
+        <h2 style="font-weight: bold">Marksheet</h2>
+
+        <div class="certificate-details">
+            <div class="student-info">
+                <p class="student-name">
+                    This is to certify that <strong>Mr {{ student.name }}</strong>
+                </p>
+                <p class="course">
+                    has successfully completed the <strong>{{ result.exam.exam }}</strong> held on
+                    <strong>{{result.exam.date}}</strong>
+                </p>
+            </div>
+            <div class="profile-pic">
+                {% if student.profile_pic %}
                 <img src="/media/{{ student.profile_pic }}" style="width: 100px; height: 100px" alt="Profile Picture" />
-            {% else %}
-                <img src="{% static 'images/blankpp.jpg' %}" style="width: 100px; height: 100px" alt="Profile Picture" />
-            {% endif %}
+                {% else %}
+                <img src="{% static 'images/blankpp.jpg' %}" style="width: 100px; height: 100px"
+                    alt="Profile Picture" />
+                {% endif %}
+            </div>
+            <div style="clear: both;"></div>
         </div>
-        <div style="clear: both;"></div>
-    </div>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Marks</th>
-                <th>Remarks</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            {% for subject_marks in result.subjectMarks %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for subject_marks in result.subjectMarks %}
                 <tr>
                     <td>{{ subject_marks.subject.sub_name }}</td>
                     <td>{{ subject_marks.marks }}</td>
                     <td>
                         {% if subject_marks.marks >= 40 %}
-                            <div style="color: rgb(11, 116, 130)">Pass</div>
+                        <div style="color: rgb(11, 116, 130)">Pass</div>
                         {% else %}
-                            <div style="color: red">Fail *</div>
+                        <div style="color: red">Fail *</div>
                         {% endif %}
                     </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    <div class="marks-details" style="
+        <div class="marks-details" style="
         font-size: small;
         font-family: 'Times New Roman', Times, serif;
         margin-top: 50px;
     ">
-        
-        <p>Total Marks: <strong>{{ result.total_marks }}</strong></p>
-        <p>Percentage: <strong>{{ percentage|floatformat:1 }}%</strong></p>
-        <p>Rank: {{ result.rank }}</p>
+
+            <p>Total Marks: <strong>{{ result.total_marks }}</strong></p>
+            <p>Percentage: <strong>{{ result.percentage|floatformat:1 }}%</strong></p>
+            <p>Rank: <strong>{{ result.rank }}</strong></p>
+        </div>
+        {% endif %}
+
+        {% if result.rank == None %}
+        <div class="alert alert-danger">Result Not Published For {{result.exam.exam}}</div>
+        {% endif %}
     </div>
-</div>
-{% endfor %}
-{% endblock %}
+    {% endfor %}
+    <footer style="margin-top: 20px;">
+        <p>&copy; 2023 Designed and Built by Roman Humagain</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
+        </script>
+</body>
+
+</html>

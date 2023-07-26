@@ -1,60 +1,34 @@
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>View Student</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'staff_css/view_student.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
 </head>
-<style>
-.logo {
-    margin-left: 10px;
-    width: 75px;
-    height: 75px;
-    background-color: #f06292;
-    /* Set your desired background color */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-  .logo-text {
-    color: #0c0c0c;
-    /* Set your desired text color */
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .logo-highlight {
-    color: #09cee3;
-    margin-left: 4px;
-    /* Set your desired highlight color */
-  }
-footer {
-  color: #766f6f;
-  padding: 10px;
-  text-align: center;
-  font-style: italic;
-}
-</style>
 <body>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
       <div class="logo">
         <span class="logo-text">My<span class="logo-highlight">School</span></span>
       </div>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/staff/staff_dashboard" style="margin-left: 50px;">Dashboard</a>
+            <a class="nav-link active" aria-current="page" href="/staff/staff_dashboard"
+              style="margin-left: 50px;">Dashboard</a>
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -77,214 +51,148 @@ footer {
           <li class="nav-item">
             <a class="nav-link" href="/staff/attendance/">Attendence</a>
           </li>
-          
+
         </ul>
         <form class="d-flex" role="search">
           <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-dark" type="submit">Search</button>
         </form>
-        
-    </div>
-         <div class="m-2"><a href="/student/signout/" class="btn btn-danger">Sign Out</a></div>
-        
+
+      </div>
+      <div class="m-2"><a href="/student/signout/" class="btn btn-danger">Sign Out</a></div>
+
     </div>
   </nav>
 
-<body>
-  {% if messages %}
-  {% for message in messages %}
-  {% if message.tags == 'success' %}
-<div class="alert alert-success">{{message}}</div>
-  {% endif %}
-  {% endfor %}
-  {% endif %}
-<form>
-  <div class="d-flex justify-content-center m-1">
-    <button
-      type="submit"
-      name="action"
-      value="all"
-      class="btn btn-outline-danger me-2 "
-    >
-      All
-    </button>
-    <button
-      type="submit"
-      name="action"
-      value="bsc"
-      class="btn btn-outline-primary me-2"
-    >
-      BSC
-    </button>
-    <button
-      type="submit"
-      name="action"
-      value="bba"
-      class="btn btn-outline-success"
-    >
-      BBA
-    </button>
-  </div>
-</form>
-
-{% if not error_message %}
-<div class="container">
-  <table class="table table-striped table-hover shadow-lg m-4" style="font-size: small;">
-    <thead>
-      <tr>
-        <th scope="col" class="small">S.N</th>
-        <th scope="col" class="small">Name</th>
-        <th scope="col" class="small">Email</th>
-        <th scope="col" class="small">Address</th>
-        <th scope="col" class="small">D.O.B</th>
-        <th scope="col" class="small">Phone No</th>
-        <th scope="col" class="small">Intake</th>
-        <th scope="col" class="small">Level</th>
-        <th scope="col" class="small">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for data in querySet %}
-      <tr>
-        <td>{{forloop.counter}}</td>
-        <td>{{data.name}}</td>
-        <td>{{data.user.username}}</td>
-        <td>{{data.address}}</td>
-        <td>{{data.dob}}</td>
-        <td>{{data.phone_no}}</td>
-        <td>{{data.intake}}</td>
-        <td>{{data.level}}</td>
-        <td>
-          <a
-            href=""
-            class="btn btn-outline-danger send-email-btn"
-            data-bs-toggle="modal"
-            data-bs-target="#mailModal"
-            data-email="{{ data.user.username }}"
-            >Send Email</a
-          >
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-{% endif %}
-
-{% if error_message %}
-<div class="alert alert-danger">{{error_message}}</div>
-{% endif %}
-
-
-
-<div
-  class="modal fade"
-  id="mailModal"
-  data-bs-backdrop="static"
-  data-bs-keyboard="false"
-  tabindex="-1"
-  aria-labelledby="mailModal"
-  aria-hidden="true"
->
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="mailModal">Compose Email</h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
+  <body>
+    {% if messages %}
+    {% for message in messages %}
+    {% if message.tags == 'success' %}
+    <div class="alert alert-success">{{message}}</div>
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    <form>
+      <div class="d-flex justify-content-center m-1">
+        <button type="submit" name="action" value="all" class="btn btn-outline-danger me-2 ">
+          All
+        </button>
+        <button type="submit" name="action" value="bsc" class="btn btn-outline-primary me-2">
+          BSC
+        </button>
+        <button type="submit" name="action" value="bba" class="btn btn-outline-success">
+          BBA
+        </button>
       </div>
-      <div class="modal-body">
-        <div class="container">
-          <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group m-2">
-              <label for="to">To:</label>
-              <input
-                type="email"
-                class="form-control"
-                id="to"
-                name="to"
-                required
-              />
+    </form>
+
+    {% if not error_message %}
+    <div class="container">
+      <table class="table table-striped table-hover shadow-lg m-4" style="font-size: small;">
+        <thead>
+          <tr>
+            <th scope="col" class="small">S.N</th>
+            <th scope="col" class="small">Name</th>
+            <th scope="col" class="small">Email</th>
+            <th scope="col" class="small">Address</th>
+            <th scope="col" class="small">D.O.B</th>
+            <th scope="col" class="small">Phone No</th>
+            <th scope="col" class="small">Intake</th>
+            <th scope="col" class="small">Level</th>
+            <th scope="col" class="small">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in querySet %}
+          <tr>
+            <td>{{forloop.counter}}</td>
+            <td>{{data.name}}</td>
+            <td>{{data.user.username}}</td>
+            <td>{{data.address}}</td>
+            <td>{{data.dob}}</td>
+            <td>{{data.phone_no}}</td>
+            <td>{{data.intake}}</td>
+            <td>{{data.level}}</td>
+            <td>
+              <a href="" class="btn btn-outline-danger send-email-btn" data-bs-toggle="modal"
+                data-bs-target="#mailModal" data-email="{{ data.user.username }}">Send Email</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+    {% if error_message %}
+    <div class="alert alert-danger">{{error_message}}</div>
+    {% endif %}
+    <div class="modal fade" id="mailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+      aria-labelledby="mailModal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="mailModal">Compose Email</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group m-2">
+                  <label for="to">To:</label>
+                  <input type="email" class="form-control" id="to" name="to" required />
+                </div>
+                <div class="form-group m-2">
+                  <label for="inputSubject">Subject:</label>
+                  <input type="text" class="form-control" id="inputSubject" name="subject" required />
+                </div>
+                <div class="form-group m-2">
+                  <label for="inputMessage">Message:</label>
+                  <textarea class="form-control" id="inputMessage" name="message" rows="10" style="height: 100px"
+                    required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="inputAttachments">Attachments:</label>
+                  <input type="file" class="form-control-file" id="inputAttachments" name="attachment" multiple />
+                </div>
+                <hr />
+                <div class="form-group">
+                  <button type="submit" name="action" value="send_email" class="btn btn-primary">
+                    Send
+                  </button>
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    Discard
+                  </button>
+                </div>
+              </form>
             </div>
-            <div class="form-group m-2">
-              <label for="inputSubject">Subject:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="inputSubject"
-                name="subject"
-                required
-              />
-            </div>
-            <div class="form-group m-2">
-              <label for="inputMessage">Message:</label>
-              <textarea
-                class="form-control"
-                id="inputMessage"
-                name="message"
-                rows="10"
-                style="height: 100px"
-                required
-              ></textarea>
-            </div>
-            <div class="form-group">
-              <label for="inputAttachments">Attachments:</label>
-              <input
-                type="file"
-                class="form-control-file"
-                id="inputAttachments"
-                name="attachment"
-                multiple
-              />
-            </div>
-            <hr />
-            <div class="form-group">
-              <button
-                type="submit"
-                name="action"
-                value="send_email"
-                class="btn btn-primary"
-              >
-                Send
-              </button>
-              <button
-                type="button"
-                class="btn btn-danger"
-                data-bs-dismiss="modal"
-              >
-                Discard
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const sendEmailButtons = document.querySelectorAll(".send-email-btn");
-    const emailInput = document.querySelector("#to");
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sendEmailButtons = document.querySelectorAll(".send-email-btn");
+        const emailInput = document.querySelector("#to");
 
-    sendEmailButtons.forEach(function (button) {
-      button.addEventListener("click", function (event) {
-        const to = event.target.dataset.email;
-        emailInput.value = to;
+        sendEmailButtons.forEach(function (button) {
+          button.addEventListener("click", function (event) {
+            const to = event.target.dataset.email;
+            emailInput.value = to;
+          });
+        });
       });
-    });
-  });
-</script>
-<footer style="margin-top: 20px;">
-  <p>&copy; 2023 Designed and Built by Roman Humagain</p>
-</footer>
+    </script>
+    <footer style="margin-top: 20px;">
+      <p>&copy; 2023 Designed and Built by Roman Humagain</p>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"></script>
 
-</body>
+  </body>
+
 </html>

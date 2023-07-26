@@ -1,0 +1,46 @@
+.logo {
+  /* margin-left: 10px; */
+  width: 75px;
+  height: 75px;
+  background-color: #f06292;
+
+  /* Set your desired background color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #0c0c0c;
+  /* Set your desired text color */
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo-highlight {
+  color: #0cd0cd;
+  margin-left: 4px;
+  /* Set your desired highlight color */
+}
+footer{
+  margin-top: 20px;
+  color:#635d5d;
+  text-align: center;
+  font-style: italic;
+  background-color: white; 
+}
+
+.badge_custom {
+  color: white;
+  background-color: #007bff;
+  display: inline-block;
+  padding: 0.5em 0.6em; /* Increased padding */
+  font-size: 100%; /* Increased font size */
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}

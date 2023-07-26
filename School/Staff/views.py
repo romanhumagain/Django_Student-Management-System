@@ -79,10 +79,10 @@ def student_registration(request):
     level = data.get('level')
     
     user = User.objects.create(username = email)
-    user.set_password("admin")
+    user.set_password(password)
     user.save()
     
-    userType = UserType.objects.create(user = user , user_type = "staff")
+    userType = UserType.objects.create(user = user)
     
     profile = Profile.objects.create(user = user , token = str(uuid.uuid4()))
     
@@ -415,9 +415,20 @@ def view_marksheet(request, id):
     student = Student.objects.get(id=id)  # Get the selected student
     course = student.course
     level = student.level
+    
+    if request.method == 'POST':
+        data = request.POST
+        search = data.get('search')
+        
+        if search:
+          exams = exams.filter(Q(exam__icontains = search)|
+                               Q(date__icontains = search))
+      
+    
     context = {'exams': exams, 'student': student}
     
     totalMarkObject = TotalMark.objects.filter(student = student)
+    
     results = []
     
     for exam in exams:
@@ -425,12 +436,16 @@ def view_marksheet(request, id):
       sub_count = Subject.objects.filter(course__course = course , level__level = level).count()
       total_full_marks = sub_count * 100
       
-      totalMarks = TotalMark.objects.get(student =student , exam = exam)
-      total_marks = totalMarks.total_mark
-      
-      percentage = (total_marks / total_full_marks) * 100 if total_full_marks != 0 else 0
-      rank = totalMarks.rank if totalMarks else None
-      
+      try:
+        totalMarks = TotalMark.objects.get(student =student , exam = exam)
+        total_marks = totalMarks.total_mark
+        percentage = (total_marks / total_full_marks) * 100 if total_full_marks != 0 else 0
+        rank = totalMarks.rank if totalMarks else None
+      except TotalMark.DoesNotExist:
+        total_marks = None
+        percentage = None
+        rank = None
+        
       results.append({
         'exam':exam,
         'subjectMarks':subjectMarks,
@@ -438,10 +453,9 @@ def view_marksheet(request, id):
         'percentage':percentage,
         'rank':rank
       })
-      
-      context = {
+      context .update({
         'results':results,
         'student':student,
-                 }
+                 })
     
     return render(request, 'marksheet.html', context)

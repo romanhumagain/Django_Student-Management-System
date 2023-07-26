@@ -5,8 +5,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Dashboard</title>
-  <link rel="stylesheet" href="{% static 'student_css/std_dashboard.css' %}">
+  <title>Attendance Dashboard</title>
+  <link rel="stylesheet" href="{% static 'student_css/std_attendance.css' %}">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
@@ -32,7 +32,7 @@
               {% if notice_count > 0 %}
               <span class="visually-hidden">Notice</span>
               <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%);margin-right: 43px; margin-top: 40px;">{{notice_count}}</span>
+                style="transform: translateY(-50%);margin-right: 33px; margin-top: 40px;">{{notice_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item d-flex align-items-center" style="position: relative;">
@@ -40,61 +40,77 @@
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
               <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%); margin-right: -4px; margin-top: 39px;">{{ass_count}}</span>
+                style="transform: translateY(-50%); margin-right: -14px; margin-top: 39px;">{{ass_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/student/gradesheet/{{uid}}/" style="margin-top: 15px;">Grades</a>
             </li>
-            <li class="nav-item d-flex">
+            <li class="nav-item">
               <a class="nav-link" href="/student/std_attendance/{{uid}}/" style="margin-top: 15px;">Attendance</a>
-              {% if absent_error %}
-              <i class="fa fa-exclamation-circle" style="color: red; padding-left: 5px; margin-top: 30px;"></i>
-              {% endif %}
-          </li>
+            </li>
             <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
           </ul>
         </nav>
       </div>
       <div class="col-lg-10 offset-lg-2">
-        <div class="container">
-          <div class="row ">
-            <div class="col-md-6">
-              <div class="card mt-4" style="width: 700px; margin-left:175px ;">
-                <div class="card-header bg-secondary text-white">
-                  <h2 id="assignment-details">Recent Assignments</h2>
-                </div>
-                <div class="card-body">
-                  <ul class="list-group">
-                    {% for assignment in assignments %}
-                    <li class="list-group-item">
-                      <div class="row">
-                        <div class="col-md-8">
-                          <p>{{ assignment.assignment }}</p>
-                        </div>
-                        <div class="col-md-3">
-                          <div class="assignment-details">
-                            <p class="due-date">Due Date:</p>
-                            <p class="date-time">{{assignment.due_date}} {{ assignment.due_time|time:"g:i A" }} </p>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    {% empty %}
-                    <li class="list-group-item">No assignments posted yet.</li>
-                    {% endfor %}
-                  </ul>
-                </div>
-              </div>
+
+        <form class="d-flex" role="search" style="margin-top: 10px; margin-left: 850px; width: 330px;" method="POST">
+          {% csrf_token %}
+          <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-dark" type="submit">Search</button>
+        </form>
+        <div class="container mt-3">
+
+          <div class="card">
+            <div class="card-header">
+              <h4>Attendance Tracker</h4>
+            </div>
+            <div class="card-body">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for record in attendance_records %}
+                  <tr>
+                    <td>{{ record.date }}</td>
+                    <td>
+                      <span
+                        class="badge badge-{% if record.attendance == 'Present' %}success{% else %}danger{% endif %}">
+                        {{ record.attendance }}
+                      </span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-        <footer>
+
+          {% if present_attendance_percentage < 50 %}
+        <button type="button" class="btn btn-danger m-3">
+          Attendance <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}}%</span>
+        </button>
+        {% endif%}
+
+        {% if present_attendance_percentage >= 50 %}
+        <button type="button" class="btn btn-primary m-3">
+          Attendance <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}} %</span>
+        </button>
+        {% endif%}
+      </div>
+        <footer >
           <p>&copy; 2023 Designed and Built by Roman Humagain</p>
-        </footer> 
+        </footer>
       </div>
     </div>
   </div>
+
+   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>
@@ -102,4 +118,5 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

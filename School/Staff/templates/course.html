@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% load static %}
 {% block body %}
 {% if messages %}
@@ -19,7 +18,6 @@
       <a href="#bsc-details" class="btn btn-primary">Course Details</a>
     </div>
   </div>
-
   <div class="card shadow-lg m-2" style="width: 18rem;">
     <img src="{% static 'images/bsc.jpg' %}" class="card-img-top" alt="bba">
     <div class="card-body">
@@ -56,7 +54,6 @@
       </div>
     </div>
   </div>
-
   <form class=" container card shadow-lg p-3 justify-content-center" style="width: 400px; margin-top: 20px;"
     method="post">
     {% csrf_token %}
@@ -74,11 +71,8 @@
       <option value="Level 5">L-5</option>
       <option value="Level 6">L-6</option>
     </select>
-
     <button type="submit" name="action" value="bsc" class=" btn btn-outline-primary">Add Course</button>
-
   </form>
-
   <!-- subject table for BSC -->
   {% for level in levels %}
   <h5 style="margin-top: 20px; background-color: cadetblue; padding: 9px;">{{ level }} - BSC</h5>
@@ -106,7 +100,6 @@
   </div>
   {% endfor %}
 </div>
-
 <hr>
 <div class="container">
   <div class="container justify-content-center">
@@ -134,7 +127,6 @@
       </div>
     </div>
   </div>
-
   <form class=" container card shadow-lg p-3 justify-content-center" style="width: 400px; margin-top: 20px;"
     method="post">
     {% csrf_token %}
@@ -152,9 +144,7 @@
       <option value="Level 5">L-5</option>
       <option value="Level 6">L-6</option>
     </select>
-
     <button type="submit" name="action" value="bba" class=" btn btn-outline-primary">Add Course</button>
-
   </form>
 </div>
 
@@ -183,6 +173,4 @@
     }
   });
 </script>
-
-
 {% endblock %}

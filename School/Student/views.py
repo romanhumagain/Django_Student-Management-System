@@ -9,15 +9,16 @@ from  Staff . models import *
 from .utils import *
 from django.db.models import Sum
 
-from datetime import datetime
+from datetime import datetime , date
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 import uuid
 
 @login_required(login_url='/')
 def student_dashboard(request , uid ):
-  student = Student.objects.get(user = uid)
-  
+  user = User.objects.get(id = uid)
+  student = Student.objects.get(user = user)
+  context = {}
   user = User.objects.get(id = uid)
   profile = Profile.objects.get(user = user)
   
@@ -31,6 +32,20 @@ def student_dashboard(request , uid ):
   assignment = Assignment.objects.filter(course = course_id , level = level_id)
   
   ass_count = assignment.count()
+  current_date = date.today()
+  
+  attendance = Attendance.objects.get(student = student , date = current_date)
+  attendance_status =  attendance.attendance 
+  try:
+    if attendance_status == "Absent":
+      context.update({'absent_error': "Absent"})
+    
+    else:
+      context.update({'absent_error':None})
+      
+  except Attendance.DoesNotExist:
+    pass
+    
   
   current_time = datetime.now().time()
   greeting = ""
@@ -41,8 +56,7 @@ def student_dashboard(request , uid ):
   else:
         greeting = "Good Evening"
   
-  context = {'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count , 'greeting':greeting}
-  
+  context.update({'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count , 'greeting':greeting})
   
   if not is_verified:
     context['verification_error'] = 'please verify your account'
@@ -55,19 +69,7 @@ def student_dashboard(request , uid ):
       student.save()
       messages.success(request , 'Successfully Uploaded Profile Pic')
       return redirect(f'/student/student_dashboard/{uid}')
-    
-    if action == 'change_password':
-       password = request.POST.get('password')
-       
-       user = User.objects.get(id = uid)
-       user.set_password(password)
-       user.save()
-       
-       update_session_auth_hash(request, user)
-       
-       messages.success(request , 'successfully changed password, Re-login your account ')
-       return redirect('/')
-       
+   
     if action == 'verify':
       user = User.objects.get(id = uid)
       email = user.username
@@ -133,6 +135,30 @@ def gradesheet(request, id):
             'uid': id,
         }
 
+        notice = Notice.objects.all()
+        notice_count = notice.count()
+        
+        level_id = student.level
+        course_id = student.course
+  
+        ass_count = Assignment.objects.filter(course = course_id , level = level_id).count()
+        
+        context.update({'notice_count':notice_count , 'ass_count':ass_count})
+        
+        current_date = date.today()
+        attendance = Attendance.objects.get(student = student , date = current_date)
+        attendance_status =  attendance.attendance 
+        try:
+          if attendance_status == "Absent":
+            context.update({'absent_error': "Absent"})
+          
+          else:
+            context.update({'absent_error':None})
+            
+        except Attendance.DoesNotExist:
+          pass
+    
+
         return render(request, 'gradesheet.html', context)
 
     except User.DoesNotExist:
@@ -140,18 +166,72 @@ def gradesheet(request, id):
 
     except Student.DoesNotExist:
         return HttpResponse('Student Not Found!')
-
-      
-      
-def view_assignment(request , id):
   
+def view_assignment(request , id):
   user = User.objects.get(id= id)
   student = Student.objects.get(user = user)
+  context = {}
+  
+  notice = Notice.objects.all()
+  notice_count = notice.count()
+  
+  current_date = date.today()
+  attendance = Attendance.objects.get(student = student , date = current_date)
+  attendance_status =  attendance.attendance 
+  try:
+    if attendance_status == "Absent":
+      context.update({'absent_error': "Absent"})
+    
+    else:
+      context.update({'absent_error':None})
+      
+  except Attendance.DoesNotExist:
+    pass
+    
   
   level_id = student.level
   course_id = student.course
   
   assignment = Assignment.objects.filter(course = course_id , level = level_id)
   
-  context = {'student':student ,'uid':id ,'assignments':assignment }
+  context.update({'student':student ,'uid':id ,'assignments':assignment  , 'notice_count':notice_count})
   return render(request , 'std_assignment.html' , context)
+
+def view_attendance(request , id):
+    context = {}
+    user = User.objects.get(id = id)
+    student = Student.objects.get(user = user)
+    attendance_records = Attendance.objects.filter(student = student).order_by('-date')
+    
+    attendance_count = attendance_records.count()
+    present_attendance_count = 0
+  
+    for attendance in attendance_records:
+        if attendance.attendance == "Present":
+            present_attendance_count += 1
+    
+    if attendance_count != 0:
+        present_attendance_percentage = (present_attendance_count / attendance_count) * 100
+        context.update({"present_attendance_percentage":present_attendance_percentage})
+    else:
+        context.update({'attendance_status':"Attendance Not Taken"})
+    
+    if request.method == "POST":
+        data = request.POST
+        search = data.get('search')
+        
+        if search:
+            attendance_records = attendance_records.filter(date__contains = search)
+    
+    notice = Notice.objects.all()
+    notice_count = notice.count()
+        
+    level_id = student.level
+    course_id = student.course
+  
+    ass_count = Assignment.objects.filter(course = course_id , level = level_id).count()
+        
+    context.update({'notice_count':notice_count , 'ass_count':ass_count})
+    
+    context.update({'attendance_records':attendance_records , 'uid':id})
+    return render(request, 'std_attendance.html' , context)

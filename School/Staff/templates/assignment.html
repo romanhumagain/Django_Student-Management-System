@@ -1,24 +1,21 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Assignment Dashboard{% endblock %}
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="{% static 'css/assignment.css' %}">
-
+ {% load static %} 
+ {% block title %}AssignmentDashboard{% endblock %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet" href="{% static 'css/assignment.css' %}" />
 {% block body %}
-{% if messages %}
-{% for message in messages %}
-{% if message.tags == 'success' %}
-<div class="alert alert-success">{{message}}</div>
+ {% if messages %}
+  {% for message in messages %}
+   {% if message.tags == 'success' %}
+    <div class="alert alert-success">{{message}}</div>
+  {% endif %}
+ {% endfor %}
 {% endif %}
-{% endfor %}
-{% endif %}
-
 <div class="container">
   <div class="row">
     <div class="col-md-6">
       <div class="card shadow-lg">
-        <div class="card-header" style="background-color:#f5a623;">
+        <div class="card-header" style="background-color: #f5a623">
           <h2>Post Assignment</h2>
         </div>
         <div class="card-body shadow-lg">
@@ -49,20 +46,20 @@
               <label for="due_date">Due Date:</label>
               <div class="row">
                 <div class="col">
-                  <input type="date" class="form-control" id="due_date" name="date" required>
+                  <input type="date" class="form-control" id="due_date" name="date" required />
                 </div>
                 <div class="col">
-                  <input type="time" class="form-control" id="due_time" name="time" required>
+                  <input type="time" class="form-control" id="due_time" name="time" required />
                 </div>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Post Assignment</button>
+            <button type="submit" class="btn btn-primary">
+              Post Assignment
+            </button>
           </form>
         </div>
-
       </div>
     </div>
-
     <div class="col-md-6">
       <div class="card mt-4 shadow">
         <div class="card-header bg-secondary text-white">
@@ -73,20 +70,24 @@
             {% for assignment in assignments %}
             <li class="list-group-item">
               <a href="/staff/delete_assignment/{{assignment.id}}/" class="btn-close" aria-label="Close"
-                style="margin-left: 520px;"></a>
+                style="margin-left: 520px"></a>
               <div class="row">
                 <div class="col-md-8">
-                  <h5>{{ assignment.course.course }} - {{ assignment.level.level }}</h5>
+                  <h5>
+                    {{ assignment.course.course }} - {{ assignment.level.level}}
+                  </h5>
                   <p>{{ assignment.assignment }}</p>
                 </div>
                 <div class="col-md-3">
                   <div class="assignment-details">
                     <p class="due-date">Due Date:</p>
-                    <p class="date-time">{{assignment.due_date}} {{ assignment.due_time|time:"g:i A" }} </p>
+                    <p class="date-time">
+                      {{assignment.due_date}} {{ assignment.due_time|time:"g:i
+                      A" }}
+                    </p>
                   </div>
                 </div>
               </div>
-
             </li>
             {% empty %}
             <li class="list-group-item">No assignments posted yet.</li>

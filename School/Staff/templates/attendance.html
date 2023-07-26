@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %} Attendence {% endblock %}
-
 <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
 {% block body %}
-
 {% if messages %}
 {% for message in messages %} 
 {% if message.tags == "error" %}
@@ -34,7 +32,6 @@
                         BBA
                     </label>
                 </div>
-                
             </div>
         </div>
         <div class="card m-2 shadow-lg" style="width: 400px;">
@@ -60,11 +57,9 @@
                 </div>
             </div>
         </div>
-
         <button type="submit"  name="action" value = "sort" class="btn btn-primary m-2">Take Attendance</button>
       </form>
     </div>
-
     {% if students %}
     <hr>
     <div class="container">
@@ -94,7 +89,6 @@
             {% endfor %}
           </tbody>
         </table>
-      
     <button type="submit" name="action" value = "attendance" class="btn btn-primary" style="margin-left:1200px;">Submit</button>
   </form>
 </div>

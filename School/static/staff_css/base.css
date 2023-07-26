@@ -1,0 +1,43 @@
+
+footer {
+  color: #766f6f;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo {
+  margin-left: 10px;
+  width: 75px;
+  height: 75px;
+  background-color: #f06292;
+  /* Set your desired background color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #0c0c0c;
+  /* Set your desired text color */
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo-highlight {
+  color: #09cee3;
+  margin-left: 4px;
+  /* Set your desired highlight color */
+}
+
+
