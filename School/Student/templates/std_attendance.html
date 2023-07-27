@@ -3,65 +3,94 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Attendance Dashboard</title>
-  <link rel="stylesheet" href="{% static 'student_css/std_attendance.css' %}">
+  <link rel="stylesheet" href="{% static 'student_css/std_attendance.css' %}" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
 </head>
 
 <body>
-  <div class="container-fluid ">
+  <div class="container-fluid">
     <div class="row">
       <div class="col-lg-2 bg-body-tertiary position-fixed">
         <nav class="navbar flex-column">
           <div class="logo">
             <span class="logo-text">My<span class="logo-highlight">School</span></span>
           </div>
-          <ul class="navbar-nav p-4" style="font-family: sans-serif;">
+          <ul class="navbar-nav p-4" style="font-family: sans-serif; right: 15px">
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
             </li>
-            <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="#notice-details" style="margin-top: 15px;">Notice</a>
+            <li class="nav-item d-flex align-items-center" style="position: relative">
+              <a class="nav-link" href="/student/student_dashboard/{{uid}}/#notice-details"
+                style="margin-top: 15px">Notice</a>
               {% if notice_count > 0 %}
               <span class="visually-hidden">Notice</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%);margin-right: 33px; margin-top: 40px;">{{notice_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="
+                    transform: translateY(-50%);
+                    margin-right: 38px;
+                    margin-top: 40px;
+                    padding: 0.2em 0.4em;
+                    font-size: 78%;
+                  ">{{notice_count}}</span>
               {% endif %}
             </li>
-            <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px; padding-right: 10px;">Assignment</a>
+            <li class="nav-item d-flex align-items-center" style="position: relative">
+              <a class="nav-link" href="{% url 'std_assignment' uid %}"
+                style="margin-top: 15px; padding-right: 10px">Assignment</a>
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%); margin-right: -14px; margin-top: 39px;">{{ass_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="
+                    transform: translateY(-50%);
+                    margin-right: -10px;
+                    margin-top: 40px;
+                    padding: 0.2em 0.4em;
+                    font-size: 78%;
+                  ">{{ass_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/student/gradesheet/{{uid}}/" style="margin-top: 15px;">Grades</a>
+              <a class="nav-link" href="/student/gradesheet/{{uid}}/" style="margin-top: 15px">Grades</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/student/std_attendance/{{uid}}/" style="margin-top: 15px;">Attendance</a>
+            <li class="nav-item d-flex">
+              <a class="nav-link" href="/student/std_attendance/{{uid}}/" style="margin-top: 15px">Attendance</a>
+              {% if absent_error %}
+              <i class="fa fa-exclamation-circle" style="color: red; padding-left: 5px; margin-top: 30px"></i>
+              {% elif pending_status %}
+              <i class="fas fa-spinner" style="color: orange; padding-left: 5px; margin-top: 30px"></i>
+              {% else %}
+              <i class="fa fa-check-circle" style="color: blue; padding-left: 5px; margin-top: 30px"></i>
+              {% endif %}
             </li>
-            <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
+            <a href="/student/signout/" class="btn btn-danger" style="margin-top: 180px">Sign Out</a>
           </ul>
         </nav>
       </div>
       <div class="col-lg-10 offset-lg-2">
-
-        <form class="d-flex" role="search" style="margin-top: 10px; margin-left: 850px; width: 330px;" method="POST">
+        <form class="d-flex" role="search" style="margin-top: 10px; margin-left: 880px; width: 300px" method="POST">
           {% csrf_token %}
-          <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+          <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search" />
           <button class="btn btn-outline-dark" type="submit">Search</button>
         </form>
+        {% if attendance_records %}
         <div class="container mt-3">
-
+          {% if absent_error %}
+          <div class="alert alert-danger">You are marked <strong>Absent</strong> today</div>
+          {% elif pending_status %}
+          <div class="alert alert-secondary">
+            Your Attendance is pending today
+          </div>
+          {% else %}
+          <div class="alert alert-primary">
+            You are marked <strong>Present</strong> today
+          </div>
+          {% endif %}
           <div class="card">
             <div class="card-header">
               <h4>Attendance Tracker</h4>
@@ -89,28 +118,67 @@
                 </tbody>
               </table>
             </div>
+
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                {% if attendance_records.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page=1" aria-label="First">
+                    <span aria-hidden="true">&laquo;&laquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ attendance_records.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+                {% for i in attendance_records.paginator.page_range %}
+                <li class="page-item {% if attendance_records.number == i %}active{% endif %}">
+                  <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+                {% if attendance_records.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ attendance_records.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ attendance_records.paginator.num_pages }}" aria-label="Last">
+                    <span aria-hidden="true">&raquo;&raquo;</span>
+                  </a>
+                </li>
+                {% endif %}
+              </ul>
+            </nav>
           </div>
 
-          {% if present_attendance_percentage < 50 %}
-        <button type="button" class="btn btn-danger m-3">
-          Attendance <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}}%</span>
-        </button>
-        {% endif%}
+          {% if present_attendance_percentage < 50 %} <button type="button" class="btn btn-danger m-3">
+            Attendance
+            <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}}%</span>
+            </button>
+            {% endif%} {% if present_attendance_percentage >= 50 %}
+            <button type="button" class="btn btn-primary m-3">
+              Attendance
+              <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}} %</span>
+            </button>
+            {% endif%}
+        </div>
+        {% endif %}
 
-        {% if present_attendance_percentage >= 50 %}
-        <button type="button" class="btn btn-primary m-3">
-          Attendance <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}} %</span>
-        </button>
-        {% endif%}
-      </div>
-        <footer >
+        {% if not attendance_records %}
+        <div class="container mt-3">
+          <div class="alert alert-danger">Attendance not taken yet !!</div>
+        </div>
+        {% endif %}
+        <footer>
           <p>&copy; 2023 Designed and Built by Roman Humagain</p>
         </footer>
       </div>
     </div>
   </div>
 
-   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>

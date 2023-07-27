@@ -121,9 +121,44 @@
           {% endfor %}
         </tbody>
       </table>
+
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          {% if querySet.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ querySet.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+      
+          <li class="page-item disabled">
+            <a class="page-link">
+              Page {{ querySet.number }} of {{ querySet.paginator.num_pages }}
+            </a>
+          </li>
+          
+          {% if querySet.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ querySet.next_page_number }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ querySet.paginator.num_pages }}" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
     </div>
     {% endif %}
-
     {% if error_message %}
     <div class="alert alert-danger">{{error_message}}</div>
     {% endif %}

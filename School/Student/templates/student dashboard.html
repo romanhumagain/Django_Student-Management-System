@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +13,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
 </head>
-
+<script>
+function verification_status(){
+  alert("please verify your account first !!");
+}
+</script>
 <body>
   <div class="container-fluid ">
     <div class="row">
@@ -27,32 +30,45 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
             </li>
-            <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="#notice-details" style="margin-top: 15px;">Notice</a>
+            <li class="nav-item d-flex align-items-center " style="position: relative;">
+              <a class="nav-link" href="/student/student_dashboard/{{uid}}/#notice-details" style="margin-top: 15px; padding-right: 15px;">Notice</a>
               {% if notice_count > 0 %}
               <span class="visually-hidden">Notice</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%);margin-right: 43px; margin-top: 40px;">{{notice_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: 38px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{notice_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item d-flex align-items-center" style="position: relative;">
+              {% if not verification_error %}
               <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px; padding-right: 10px;">Assignment</a>
+              {% elif verification_error %}
+              <a class="nav-link" href="" onclick="verification_status()" style="margin-top: 15px; padding-right: 10px;">Assignment</a>
+              {% endif %}
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%); margin-right: -4px; margin-top: 39px;">{{ass_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: -10px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{ass_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item">
+              {% if not verification_error %}
               <a class="nav-link" href="/student/gradesheet/{{uid}}/" style="margin-top: 15px;">Grades</a>
+              {% elif verification_error %}
+              <a class="nav-link" href="" onclick="verification_status()" style="margin-top: 15px; padding-right: 10px;">Grades</a>
+              {% endif %}
             </li>
             <li class="nav-item d-flex">
+              {% if not verification_error %}
               <a class="nav-link" href="/student/std_attendance/{{uid}}/" style="margin-top: 15px;">Attendance</a>
+              {% elif verification_error %}
+              <a class="nav-link" href="" onclick="verification_status()" style="margin-top: 15px; padding-right: 10px;">Attendance</a>
+              {% endif %}
               {% if absent_error %}
               <i class="fa fa-exclamation-circle" style="color: red; padding-left: 5px; margin-top: 30px;"></i>
-              {% endif %}
-          </li>
-          
+              {% elif pending_status %}
+              <i class="fas fa-spinner" style="color: orange; padding-left: 5px; margin-top: 30px;"></i>
+              {% else %}
+              <i class="fa fa-check-circle" style="color: blue; padding-left: 5px; margin-top: 30px;"></i>
+              {% endif %}  
+            </li>
             <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
           </ul>
         </nav>
@@ -65,7 +81,6 @@
         {% endif %}
         {% endfor %}
         {% endif %}
-
         <div class="container">
           <div class="card shadow-lg " style="width: 800px; margin-left: 120px; margin-top: 10px; ">
             <div class="card-header">
@@ -111,7 +126,6 @@
                       {% endif %}
                     </button>
                   </form>
-
                   <button class="btn btn-secondary m-2" data-bs-toggle="modal" data-bs-target="#modalChangePassword."
                     hidden>Change
                     Password</button>
@@ -130,7 +144,6 @@
             </div>
           </div>
         </div>
-
         <!-- change password modal -->
         <!-- Modal -->
         <div class="modal fade" id="modalChangePassword" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -178,7 +191,6 @@
           </div>
         </div>
         <script>
-
           // Smooth scrolling to BBA Details section
           $('a[href^="#notice-details"]').on('click', function (event) {
             var target = $(this.getAttribute('href'));
@@ -193,16 +205,13 @@
         <footer>
           <p>&copy; 2023 Designed and Built by Roman Humagain</p>
         </footer>
-
       </div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>
-  <!-- jQuery and Bootstrap Bundle (includes Popper) -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

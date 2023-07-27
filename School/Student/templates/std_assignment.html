@@ -27,20 +27,18 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
             </li>
-            <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="#notice-details" style="margin-top: 15px;">Notice</a>
+            <li class="nav-item d-flex align-items-center pr-5" style="position: relative;">
+              <a class="nav-link" href="/student/student_dashboard/{{uid}}/#notice-details" style="margin-top: 15px;">Notice</a>
               {% if notice_count > 0 %}
               <span class="visually-hidden">Notice</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%);margin-right: 43px; margin-top: 40px;">{{notice_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: 38px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{notice_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item d-flex align-items-center" style="position: relative;">
               <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px; padding-right: 10px;">Assignment</a>
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
-                style="transform: translateY(-50%); margin-right: -4px; margin-top: 39px;">{{ass_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: -10px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{ass_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item">
@@ -50,8 +48,12 @@
               <a class="nav-link" href="/student/std_attendance/{{uid}}/" style="margin-top: 15px;">Attendance</a>
               {% if absent_error %}
               <i class="fa fa-exclamation-circle" style="color: red; padding-left: 5px; margin-top: 30px;"></i>
-              {% endif %}
-          </li>
+              {% elif pending_status %}
+              <i class="fas fa-spinner" style="color: orange; padding-left: 5px; margin-top: 30px;"></i>
+              {% else %}
+              <i class="fa fa-check-circle" style="color: blue; padding-left: 5px; margin-top: 30px;"></i>
+              {% endif %}  
+            </li>
             <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
           </ul>
         </nav>

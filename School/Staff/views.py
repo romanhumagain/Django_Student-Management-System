@@ -12,6 +12,7 @@ from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from django.db.models import Sum , Q
+from django.core.paginator import Paginator
 
 
 @login_required(login_url="/")
@@ -79,7 +80,7 @@ def student_registration(request):
     level = data.get('level')
     
     user = User.objects.create(username = email)
-    user.set_password(password)
+    user.set_password("romanroman")
     user.save()
     
     userType = UserType.objects.create(user = user)
@@ -101,7 +102,7 @@ def student_registration(request):
       level = level,
     )
     
-    send_password(email , password , intake)
+    # send_password(email , password , intake)
     messages.success(request , f'Successfully Registered {name}')
     return redirect('/staff/student_registration/')
   
@@ -113,6 +114,11 @@ def view_student(request):
   context = {}
   action = request.GET.get('action')
   
+  paginator = Paginator(student , 2)
+  page_number = request.GET.get('page' , 1)
+  page_obj = paginator.get_page(page_number)
+  
+  
   if action == "all":
     student = Student.objects.all().order_by('level__level')
   if action == "bsc": 
@@ -123,12 +129,12 @@ def view_student(request):
   search = request.GET.get('search')
   
   if search:
-    student = student.filter( Q(name__icontains = search)|
+    page_obj = student.filter( Q(name__icontains = search)|
                               Q(level__level__icontains = search ))
   if not student:
     context['error_message'] = 'No result found !'
     
-  context.update({'querySet':student})
+  context.update({'querySet':page_obj})
   
   if request.method == "POST":
     data = request.POST

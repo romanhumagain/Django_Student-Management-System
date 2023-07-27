@@ -11,9 +11,11 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-<h2 class="p-2" style="background-color: cadetblue; text-align: center;">Student Registration Form</h2>
+<div class="container">
+<h2 class="p-2" style="background-color: #0cb1af; text-align: center;">Student Registration Form</h2>
+</div>
 <div class="container center" style="display: flex;  align-items: center; justify-content: center;">
-  <form class="card shadow-lg p-4 m-4 " style="width: 500px;" method="post">
+  <form class="card shadow-lg p-4 m-1 " style="width: 500px;" method="post">
     {% csrf_token %}
     <div class="form-floating mb-3">
       <input type="text" class="form-control" id="name" name="name" placeholder="name" required>

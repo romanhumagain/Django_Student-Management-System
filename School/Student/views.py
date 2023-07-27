@@ -13,6 +13,8 @@ from datetime import datetime , date
 from django.contrib.auth.decorators import login_required
 # Create your views here.
 import uuid
+from django.core.paginator import Paginator
+
 
 @login_required(login_url='/')
 def student_dashboard(request , uid ):
@@ -33,10 +35,9 @@ def student_dashboard(request , uid ):
   
   ass_count = assignment.count()
   current_date = date.today()
-  
-  attendance = Attendance.objects.get(student = student , date = current_date)
-  attendance_status =  attendance.attendance 
   try:
+    attendance = Attendance.objects.get(student = student , date = current_date)
+    attendance_status =  attendance.attendance 
     if attendance_status == "Absent":
       context.update({'absent_error': "Absent"})
     
@@ -44,9 +45,8 @@ def student_dashboard(request , uid ):
       context.update({'absent_error':None})
       
   except Attendance.DoesNotExist:
-    pass
+    context.update({'pending_status': "Pending"})
     
-  
   current_time = datetime.now().time()
   greeting = ""
   if current_time.hour < 12:
@@ -146,9 +146,9 @@ def gradesheet(request, id):
         context.update({'notice_count':notice_count , 'ass_count':ass_count})
         
         current_date = date.today()
-        attendance = Attendance.objects.get(student = student , date = current_date)
-        attendance_status =  attendance.attendance 
         try:
+          attendance = Attendance.objects.get(student = student , date = current_date)
+          attendance_status =  attendance.attendance 
           if attendance_status == "Absent":
             context.update({'absent_error': "Absent"})
           
@@ -156,8 +156,8 @@ def gradesheet(request, id):
             context.update({'absent_error':None})
             
         except Attendance.DoesNotExist:
-          pass
-    
+          context.update({'pending_status': "Pending"})
+          
 
         return render(request, 'gradesheet.html', context)
 
@@ -176,9 +176,9 @@ def view_assignment(request , id):
   notice_count = notice.count()
   
   current_date = date.today()
-  attendance = Attendance.objects.get(student = student , date = current_date)
-  attendance_status =  attendance.attendance 
   try:
+    attendance = Attendance.objects.get(student = student , date = current_date)
+    attendance_status =  attendance.attendance 
     if attendance_status == "Absent":
       context.update({'absent_error': "Absent"})
     
@@ -186,15 +186,15 @@ def view_assignment(request , id):
       context.update({'absent_error':None})
       
   except Attendance.DoesNotExist:
-    pass
+    context.update({'pending_status': "Pending"})
     
   
   level_id = student.level
   course_id = student.course
   
   assignment = Assignment.objects.filter(course = course_id , level = level_id)
-  
-  context.update({'student':student ,'uid':id ,'assignments':assignment  , 'notice_count':notice_count})
+  ass_count = assignment.count()
+  context.update({'student':student ,'uid':id ,'assignments':assignment  , 'notice_count':notice_count , 'ass_count':ass_count})
   return render(request , 'std_assignment.html' , context)
 
 def view_attendance(request , id):
@@ -203,6 +203,11 @@ def view_attendance(request , id):
     student = Student.objects.get(user = user)
     attendance_records = Attendance.objects.filter(student = student).order_by('-date')
     
+    paginator = Paginator(attendance_records, 1)
+    page_number = request.GET.get("page" , 1)
+    page_obj = paginator.get_page(page_number)
+    
+    print(page_obj.object_list)
     attendance_count = attendance_records.count()
     present_attendance_count = 0
   
@@ -221,7 +226,7 @@ def view_attendance(request , id):
         search = data.get('search')
         
         if search:
-            attendance_records = attendance_records.filter(date__contains = search)
+            page_obj = attendance_records.filter(date__contains = search)
     
     notice = Notice.objects.all()
     notice_count = notice.count()
@@ -230,8 +235,20 @@ def view_attendance(request , id):
     course_id = student.course
   
     ass_count = Assignment.objects.filter(course = course_id , level = level_id).count()
+    current_date = date.today()
+    try:
+      attendance = Attendance.objects.get(student = student , date = current_date)
+      attendance_status =  attendance.attendance 
+      if attendance_status == "Absent":
+        context.update({'absent_error': "Absent"})
+      
+      else:
+        context.update({'absent_error':None})
         
+    except Attendance.DoesNotExist:
+      context.update({'pending_status': "Pending"})  
+       
     context.update({'notice_count':notice_count , 'ass_count':ass_count})
     
-    context.update({'attendance_records':attendance_records , 'uid':id})
+    context.update({'attendance_records':page_obj , 'uid':id})
     return render(request, 'std_attendance.html' , context)
