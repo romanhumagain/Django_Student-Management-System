@@ -156,12 +156,12 @@
 
           {% if present_attendance_percentage < 50 %} <button type="button" class="btn btn-danger m-3">
             Attendance
-            <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}}%</span>
+            <span class="badge text-bg-secondary m-1">{{present_attendance_percentage|floatformat:0}}%</span>
             </button>
             {% endif%} {% if present_attendance_percentage >= 50 %}
             <button type="button" class="btn btn-primary m-3">
               Attendance
-              <span class="badge text-bg-secondary m-1">{{present_attendance_percentage}} %</span>
+              <span class="badge text-bg-secondary m-1">{{present_attendance_percentage|floatformat:0}} %</span>
             </button>
             {% endif%}
         </div>

@@ -1,11 +1,3 @@
-
-footer {
-  color: #766f6f;
-  padding: 10px;
-  text-align: center;
-  font-style: italic;
-}
-
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -39,5 +31,9 @@ footer {
   margin-left: 4px;
   /* Set your desired highlight color */
 }
-
-
+footer {
+color: #766f6f;
+padding: 10px;
+text-align: center;
+font-style: italic;
+}

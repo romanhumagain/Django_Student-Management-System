@@ -20,7 +20,11 @@ from django.core.paginator import Paginator
 def student_dashboard(request , uid ):
   user = User.objects.get(id = uid)
   student = Student.objects.get(user = user)
-  context = {}
+  first_name, last_name = student.name.split(' ', 1)
+  name = [first_name , last_name ]
+  
+  context = {'name':name}
+  
   user = User.objects.get(id = uid)
   profile = Profile.objects.get(user = user)
   
@@ -67,7 +71,7 @@ def student_dashboard(request , uid ):
       pic= request.FILES.get('profile_pic')
       student.profile_pic = pic
       student.save()
-      messages.success(request , 'Successfully Uploaded Profile Pic')
+      # messages.success(request , 'Successfully Uploaded Profile Pic')
       return redirect(f'/student/student_dashboard/{uid}')
    
     if action == 'verify':
@@ -80,6 +84,19 @@ def student_dashboard(request , uid ):
       send_verification(email , verification_token)
       messages.success(request , 'successfully sent verification link' )
       return redirect(f'/student/student_dashboard/{uid}')
+    
+    if action == "EditInfo":
+      first_name = request.POST.get('firstName')
+      last_name = request.POST.get('lastName')
+      phone_no = request.POST.get('phoneNo')
+      
+      full_name = " ".join([first_name , last_name])
+      print(full_name)
+      student.name =  full_name
+      student.phone_no = phone_no
+      student.save()
+      
+      return redirect(f'/student/student_dashboard/{uid}/')
     
   return render(request , 'student dashboard.html' , context)
 
