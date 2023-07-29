@@ -6,19 +6,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Dashboard</title>
-  <link rel="stylesheet" href="{% static 'student_css/std_dashboard.css' %}">
+
+  <link rel="stylesheet" href="{% static 'student_css/std_assignment.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-    integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+
 </head>
 
 <body>
   <div class="container-fluid ">
     <div class="row">
-      <div class="col-lg-2 bg-body-tertiary position-fixed">
+      <div class="col-lg-2 bg-light position-fixed">
         <nav class="navbar flex-column">
           <div class="logo">
             <span class="logo-text">My<span class="logo-highlight">School</span></span>
@@ -28,17 +29,21 @@
               <a class="nav-link active" aria-current="page" href="/student/student_dashboard/{{uid}}/">Dashboard</a>
             </li>
             <li class="nav-item d-flex align-items-center pr-5" style="position: relative;">
-              <a class="nav-link" href="/student/student_dashboard/{{uid}}/#notice-details" style="margin-top: 15px;">Notice</a>
+              <a class="nav-link" href="/student/student_dashboard/{{uid}}/#notice-details"
+                style="margin-top: 15px;">Notice</a>
               {% if notice_count > 0 %}
               <span class="visually-hidden">Notice</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: 38px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{notice_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+                style="transform: translateY(-50%); margin-right: 38px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{notice_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item d-flex align-items-center" style="position: relative;">
-              <a class="nav-link" href="{% url 'std_assignment' uid %}" style="margin-top: 15px; padding-right: 10px;">Assignment</a>
+              <a class="nav-link" href="{% url 'std_assignment' uid %}"
+                style="margin-top: 15px; padding-right: 10px;">Assignment</a>
               {% if ass_count > 0 %}
               <span class="visually-hidden">Assignment</span>
-              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y" style="transform: translateY(-50%); margin-right: -10px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{ass_count}}</span>
+              <span class="badge rounded-pill bg-danger position-absolute top-0 end-0 translate-middle-y"
+                style="transform: translateY(-50%); margin-right: -10px; margin-top: 40px; padding: .2em .4em; font-size: 78%;">{{ass_count}}</span>
               {% endif %}
             </li>
             <li class="nav-item">
@@ -52,17 +57,50 @@
               <i class="fas fa-spinner" style="color: orange; padding-left: 5px; margin-top: 30px;"></i>
               {% else %}
               <i class="fa fa-check-circle" style="color: blue; padding-left: 5px; margin-top: 30px;"></i>
-              {% endif %}  
+              {% endif %}
             </li>
             <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
           </ul>
         </nav>
       </div>
-      <div class="col-lg-10 offset-lg-2">
-        <div class="container">
-          <div class="row ">
+
+      <div class="col-lg-10 offset-lg-2 pt-5">
+        <div class="container  m-1">
+          <div class="row">
+            <!-- Submission Section -->
             <div class="col-md-6">
-              <div class="card mt-4" style="width: 700px; margin-left:175px ;">
+              <div class="card ">
+                <div class="card-header" style="background-color:#0cb1af; color: white;">
+                  <h2>Submit Assignments</h2>
+                </div>
+                <div class="card-body">
+                  <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                      <label for="assignmentSelect" class="form-label">Select Assignment</label>
+                      <select class="form-control" id="assignmentSelect" name="assignmentSelect" required>
+                        {% for assignment in assignments %}
+                        <option value="{{ assignment.id }}">{{ assignment.assignment }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label for="assignmentFile" class="form-label">Upload Your Work</label>
+                      <input type="file" class="form-control" id="assignmentFile" name="assignmentFile" required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="assignmentDesc" class="form-label">Describe your work</label>
+                      <textarea class="form-control" id="assignmentDesc" rows="3" name="assignmentDesc"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Assignments Section -->
+            <div class="col-md-6">
+              <div class="card" style="font-weight: lighter; width: 600px;">
                 <div class="card-header bg-secondary text-white">
                   <h2 id="assignment-details">Recent Assignments</h2>
                 </div>
@@ -70,14 +108,15 @@
                   <ul class="list-group">
                     {% for assignment in assignments %}
                     <li class="list-group-item">
-                      <div class="row">
-                        <div class="col-md-8">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div style="width: 80%;">
+                          <p class="posted-date">Posted on: {{ assignment.posted_date|date:"F d, Y" }}</p>
                           <p>{{ assignment.assignment }}</p>
                         </div>
-                        <div class="col-md-3">
-                          <div class="assignment-details">
+                        <div class="text-right" style="width: 30%;">
+                          <div class="assignment-details" style="font-size: small;">
                             <p class="due-date">Due Date:</p>
-                            <p class="date-time">{{assignment.due_date}} {{ assignment.due_time|time:"g:i A" }} </p>
+                            <p class="date-time">{{assignment.due_date|date:"F d"}} {{ assignment.due_time|time:"g:i A" }}</p>
                           </div>
                         </div>
                       </div>
@@ -89,19 +128,25 @@
                 </div>
               </div>
             </div>
+            
+
+
+
           </div>
         </div>
+
         <footer>
           <p>&copy; 2023 Designed and Built by Roman Humagain</p>
-        </footer> 
+        </footer>
       </div>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>
-  <!-- jQuery and Bootstrap Bundle (includes Popper) -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
