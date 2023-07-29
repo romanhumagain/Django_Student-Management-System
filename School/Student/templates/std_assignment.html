@@ -13,7 +13,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
-
 </head>
 
 <body>
@@ -59,7 +58,7 @@
               <i class="fa fa-check-circle" style="color: blue; padding-left: 5px; margin-top: 30px;"></i>
               {% endif %}
             </li>
-            <a href="/student/signout/" class="btn btn-danger" style="margin-top:   180px;">Sign Out</a>
+            <a href="/student/signout/" class="btn btn-danger" style="margin-top:200px;">Sign Out</a>
           </ul>
         </nav>
       </div>
@@ -69,38 +68,40 @@
           <div class="row">
             <!-- Submission Section -->
             <div class="col-md-6">
-              <div class="card ">
-                <div class="card-header" style="background-color:#0cb1af; color: white;">
-                  <h2>Submit Assignments</h2>
+              <div class="card shadow-lg rounded">
+                <div class="card-header text-white py-3 d-flex justify-content-center align-items-center" style="background-color:#0cb1af;">
+                  <i class="fas fa-upload text-white mr-2"></i>
+                  <h2 class="mb-0">Submit Assignments</h2>
                 </div>
                 <div class="card-body">
                   <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="mb-3">
-                      <label for="assignmentSelect" class="form-label">Select Assignment</label>
-                      <select class="form-control" id="assignmentSelect" name="assignmentSelect" required>
+                      <label for="assignmentSelect" class="form-label " style="color: black; font-weight: 500;">Select Assignment <span class="text-danger" style="font-weight: bold;">*</span></label>
+                      <select class="form-control shadow-sm rounded" id="assignmentSelect" name="assignment" required>
                         {% for assignment in assignments %}
                         <option value="{{ assignment.id }}">{{ assignment.assignment }}</option>
                         {% endfor %}
                       </select>
                     </div>
                     <div class="mb-3">
-                      <label for="assignmentFile" class="form-label">Upload Your Work</label>
-                      <input type="file" class="form-control" id="assignmentFile" name="assignmentFile" required>
+                      <label for="assignmentFile" class="form-label" style="color: black; font-weight: 500;">Upload Your Work </label>
+                      <input type="file" class="form-control shadow-sm rounded" id="assignmentFile" name="assignmentFile" >
                     </div>
                     <div class="mb-3">
-                      <label for="assignmentDesc" class="form-label">Describe your work</label>
-                      <textarea class="form-control" id="assignmentDesc" rows="3" name="assignmentDesc"></textarea>
+                      <label for="assignmentDesc" class="form-label" style="color: black; font-weight: 500;">Describe your work <span class="text-danger" style="font-weight: bold;">*</span></label>
+                      <textarea class="form-control shadow-sm rounded" id="assignmentDesc" rows="3" name="assignmentDesc" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary rounded">Submit</button>
                   </form>
                 </div>
               </div>
             </div>
-
+            
+          
             <!-- Recent Assignments Section -->
             <div class="col-md-6">
-              <div class="card" style="font-weight: lighter; width: 600px;">
+              <div class="card" style="font-weight: 400; width: 600px;">
                 <div class="card-header bg-secondary text-white">
                   <h2 id="assignment-details">Recent Assignments</h2>
                 </div>
@@ -110,28 +111,59 @@
                     <li class="list-group-item">
                       <div class="d-flex justify-content-between align-items-start">
                         <div style="width: 80%;">
-                          <p class="posted-date">Posted on: {{ assignment.posted_date|date:"F d, Y" }}</p>
+                          <p class="posted-date" style="font-weight: 300; font-size: small; ">Posted on: {{ assignment.posted_date|date:"F d, Y" }}</p>
                           <p>{{ assignment.assignment }}</p>
                         </div>
                         <div class="text-right" style="width: 30%;">
                           <div class="assignment-details" style="font-size: small;">
                             <p class="due-date">Due Date:</p>
-                            <p class="date-time">{{assignment.due_date|date:"F d"}} {{ assignment.due_time|time:"g:i A" }}</p>
+                            <p class="date-time"><strong>{{assignment.due_date|date:"F d"}} {{assignment.due_time|time:"g:i A" }}</strong> </p>
                           </div>
                         </div>
                       </div>
                     </li>
                     {% empty %}
-                    <li class="list-group-item">No assignments posted yet.</li>
+                    <li class="list-group-item">No assignments due left.</li>
                     {% endfor %}
                   </ul>
                 </div>
               </div>
             </div>
-            
 
-
-
+            <div class="col-md-12 mt-4">
+              <div class="card shadow rounded">
+                <div class="card-header py-3 d-flex justify-content-center align-items-center" style="background-color: #eae6e6;">
+                  <i class="fas fa-tasks  mr-2"></i>
+                  <h2 class="mb-0 ">Submitted Assignments</h2>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group">
+                    {% for submitted_assignment in submitted_assignments %}
+                    <li class="list-group-item shadow-sm">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <div class="submitted-assignment-title">
+                          <h6 class="mb-0">{{ submitted_assignment.assignment }}</h6>
+                          <p class="m-1 submitted-date" style="font-size: 0.8rem;">Submitted on: {{ submitted_assignment.submitted_date|date:"F d, Y"}}</p>
+                        </div>
+                        <div class="submitted-assignment-details text-right">
+                          <p class="mb-1" style="font-size: 0.9rem;">
+                            {% if submitted_assignment.submission_status == "Late Submission" %}
+                            <span class="badge bg-danger">{{submitted_assignment.submission_status}}</span>
+                            {% elif submitted_assignment.submission_status == "Submitted" %}
+                            <span class="badge bg-primary">{{submitted_assignment.submission_status}}</span>
+                            {% endif %}
+                          </p>
+                          <a href="{{submitted_assignment.submitted_assignment.url}}" class="btn btn-secondary btn-sm mt-2">View File</a>
+                        </div>
+                      </div>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">No assignments submitted yet.</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

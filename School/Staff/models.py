@@ -56,8 +56,9 @@ class Assignment(models.Model):
   course = models.ForeignKey(Course, on_delete=models.CASCADE)
   level = models.ForeignKey(Level, on_delete=models.CASCADE)
   assignment = models.TextField(max_length=500)
-  due_date = models.DateField(default=timezone.now)
-  due_time = models.TimeField(default=timezone.now)
+  posted_date = models.DateField(default=None)
+  due_date = models.DateField(default=None)
+  due_time = models.TimeField(default=None)
   
   def __str__(self) -> str:
     return self.assignment
@@ -100,6 +101,22 @@ class TotalMark(models.Model):
 
     class Meta:
         unique_together = ['student', 'exam']
+        
+class SubmittedAssignment(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment , on_delete=models.CASCADE)
+    submitted_date = models.DateField(default=None)
+    submitted_time = models.TimeField(default=None)
+    submitted_assignment = models.FileField(upload_to='assignments')
+    assignment_description = models.TextField(max_length=500)
+    submission_status = models.CharField(max_length=100 ,default="pending")
+
+    def __str__(self) -> str:
+        return self.assignment.assignment 
+      
+    class Meta:
+      unique_together = ['student' ,'assignment' ]
+
 
   
   

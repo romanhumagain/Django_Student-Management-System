@@ -1,7 +1,7 @@
 from django.shortcuts import render , redirect
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import update_session_auth_hash
-
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -35,9 +35,10 @@ def student_dashboard(request , uid ):
   level_id = student.level
   course_id = student.course
   
-  assignment = Assignment.objects.filter(course = course_id , level = level_id)
-  
-  ass_count = assignment.count()
+  submitted_assignments = SubmittedAssignment.objects.filter(student = student).values_list('assignment_id', flat=True)
+  assignments = Assignment.objects.filter(course = course_id , level = level_id).exclude(id__in=submitted_assignments)
+
+  ass_count = assignments.count()
   current_date = date.today()
   try:
     attendance = Attendance.objects.get(student = student , date = current_date)
@@ -60,7 +61,7 @@ def student_dashboard(request , uid ):
   else:
         greeting = "Good Evening"
   
-  context.update({'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignment , 'ass_count':ass_count , 'greeting':greeting})
+  context.update({'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignments , 'ass_count':ass_count , 'greeting':greeting})
   
   if not is_verified:
     context['verification_error'] = 'please verify your account'
@@ -158,8 +159,10 @@ def gradesheet(request, id):
         level_id = student.level
         course_id = student.course
   
-        ass_count = Assignment.objects.filter(course = course_id , level = level_id).count()
-        
+        submitted_assignments = SubmittedAssignment.objects.filter(student = student).values_list('assignment_id', flat=True)
+        assignments = Assignment.objects.filter(course = course_id , level = level_id).exclude(id__in=submitted_assignments)
+
+        ass_count = assignments.count()
         context.update({'notice_count':notice_count , 'ass_count':ass_count})
         
         current_date = date.today()
@@ -189,10 +192,34 @@ def view_assignment(request , id):
   student = Student.objects.get(user = user)
   context = {}
   
+  current_date = date.today()
+  current_time = datetime.now().time()
+  
+  current_date_time = datetime.now()
+  
+  if request.method == "POST":
+    data = request.POST
+    assignment_id = data.get('assignment')
+    assignment_description = data.get('assignmentDesc')
+    assignment_file = request.FILES.get('assignmentFile')
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    due_date = assignment.due_date
+    due_time = assignment.due_time
+    
+    due_date_time = datetime.combine(due_date,due_time )
+    
+    assignment_status = ""
+    if current_date_time >= due_date_time :
+      assignment_status = "Late Submission"
+    else:
+      assignment_status = "Submitted"
+      
+    assignment_submission =SubmittedAssignment.objects.create(student = student , assignment = assignment ,submitted_date = current_date, submitted_time = current_time ,submitted_assignment = assignment_file , assignment_description = assignment_description , submission_status =assignment_status )
+    return redirect('std_assignment' , id = id)
+  
   notice = Notice.objects.all()
   notice_count = notice.count()
   
-  current_date = date.today()
   try:
     attendance = Attendance.objects.get(student = student , date = current_date)
     attendance_status =  attendance.attendance 
@@ -209,9 +236,14 @@ def view_assignment(request , id):
   level_id = student.level
   course_id = student.course
   
-  assignment = Assignment.objects.filter(course = course_id , level = level_id)
-  ass_count = assignment.count()
-  context.update({'student':student ,'uid':id ,'assignments':assignment  , 'notice_count':notice_count , 'ass_count':ass_count})
+
+  submitted_assignments = SubmittedAssignment.objects.filter(student = student).values_list('assignment_id', flat=True)
+  assignments = Assignment.objects.filter(course = course_id , level = level_id).exclude(id__in=submitted_assignments)
+  ass_count = assignments.count()
+
+  assignment_submissions = SubmittedAssignment.objects.filter(student = student)
+  context.update({'student':student ,'uid':id ,'assignments':assignments  , 'notice_count':notice_count , 'ass_count':ass_count , 'submitted_assignments':assignment_submissions})
+  
   return render(request , 'std_assignment.html' , context)
 
 def view_attendance(request , id):
@@ -220,7 +252,7 @@ def view_attendance(request , id):
     student = Student.objects.get(user = user)
     attendance_records = Attendance.objects.filter(student = student).order_by('-date')
     
-    paginator = Paginator(attendance_records, 1)
+    paginator = Paginator(attendance_records, 3)
     page_number = request.GET.get("page" , 1)
     page_obj = paginator.get_page(page_number)
     
@@ -251,7 +283,10 @@ def view_attendance(request , id):
     level_id = student.level
     course_id = student.course
   
-    ass_count = Assignment.objects.filter(course = course_id , level = level_id).count()
+    submitted_assignments = SubmittedAssignment.objects.filter(student = student).values_list('assignment_id', flat=True)
+    assignments = Assignment.objects.filter(course = course_id , level = level_id).exclude(id__in=submitted_assignments)
+
+    ass_count = assignments.count()
     current_date = date.today()
     try:
       attendance = Attendance.objects.get(student = student , date = current_date)

@@ -233,10 +233,11 @@ def assignment(request):
     
     course = Course.objects.get(course = course)
     level = Level.objects.get(level = level)
-    
-    assignment = Assignment.objects.create(course = course , level = level , assignment = assignment , due_date =due_date , due_time = due_time)
+    current_date = date.today()
+    assignment = Assignment.objects.create(course = course , level = level , assignment = assignment , posted_date=current_date, due_date =due_date , due_time = due_time)
     messages.success(request , 'successfully posted assignment')
     return redirect('/staff/assignment/')
+  
   assignment = Assignment.objects.all()
   context = {'assignments':assignment}
   return render( request, 'assignment.html', context)
@@ -463,5 +464,21 @@ def view_marksheet(request, id):
         'results':results,
         'student':student,
                  })
-    
     return render(request, 'marksheet.html', context)
+  
+def view_submission(request, id):
+    assignment = Assignment.objects.get(id=id)
+    submitted_assignment = SubmittedAssignment.objects.filter(assignment=assignment)
+
+    paginator = Paginator(submitted_assignment , 5)
+    page_number = request.GET.get('page' , 1)
+    page_obj = paginator.get_page(page_number)
+    
+    search = request.GET.get('search')
+    if search:
+        page_obj = submitted_assignment.filter(student__name__icontains = search)
+
+    context = {'submitted_assignment': page_obj}
+
+    return render(request, 'view_submission.html', context)
+

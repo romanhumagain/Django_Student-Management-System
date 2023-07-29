@@ -56,3 +56,14 @@ footer {
   background: #f5f5f5;
   color: #5f6368;
 }
+.status-accepted {
+  color: green;
+}
+
+.status-pending {
+  color: orange;
+}
+
+.status-rejected {
+  color: red;
+}
