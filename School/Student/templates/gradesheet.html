@@ -76,8 +76,7 @@
 
       <div class="col-lg-10 offset-lg-2">
         
-        <form class="d-flex" role="search" style="margin-top: 10px; margin-left: 910px; width: 300px;" method="POST">
-          {% csrf_token %}
+        <form class="d-flex" role="search" style="margin-top: 10px; margin-left: 910px; width: 300px;">
           <input class="form-control me-2" type="search" name="search" placeholder="Search"
               aria-label="Search" {% if search_query %} value="{{ search_query }}" {% endif %}>
           <button class="btn btn-outline-dark" type="submit">Search</button>
@@ -87,7 +86,10 @@
         <h3 class="m-2" style="text-align: center;">{{result.exam.exam}}</h3>
         <div class="container">
           {% if result.rank != None %}
+        <!-- <a href="/student/download/marksheet/{{uid}}/{{result.exam.id}}/">Download Marksheet</a> -->
+
           <h2 style="font-weight: bold">Marksheet</h2>
+    
           <div class="certificate-details">
             <div class="student-info">
               <p class="student-name">
@@ -96,13 +98,13 @@
               <p class="course">
                 has successfully completed the <strong>{{ result.exam.exam }}</strong> held on
                 <strong>{{result.exam.date}}</strong>
-              </p>
+              </p
             </div>
             <div class="profile-pic">
               {% if student.profile_pic %}
-              <img src="/media/{{ student.profile_pic }}" style="width: 100px; height: 100px" alt="Profile Picture" />
+              <img src="/media/{{ student.profile_pic }}" style=" border-radius: 50%; width: 110px; height: 110px" alt="Profile Picture" />
               {% else %}
-              <img src="{% static 'images/blankpp.jpg' %}" style="width: 100px; height: 100px" alt="Profile Picture" />
+              <img src="{% static 'images/blankpp.jpg' %}" style="border-radius: 50%; width: 110px; height: 110px" alt="Profile Picture" />
               {% endif %}
             </div>
             <div style="clear: both;"></div>

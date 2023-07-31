@@ -33,7 +33,7 @@ def send_email(to_email , subject , message , attachment):
        subject=subject,
        body=message,
        from_email=settings.EMAIL_HOST_USER,
-       to=[to_email,],
+       to=to_email,
     )
     
     if not attachment is None:

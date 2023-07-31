@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 import uuid
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 
 @login_required(login_url='/')
@@ -123,6 +124,11 @@ def gradesheet(request, id):
         exams = Examination.objects.all().order_by('-id') 
         course = student.course
         level = student.level
+        
+        search = request.GET.get('search')
+        if search:
+          exams = exams.filter(Q(exam__icontains = search)|
+                               Q(date__icontains = search))
 
         totalMarkObjects = TotalMark.objects.filter(student=student)
         results = []
@@ -304,3 +310,65 @@ def view_attendance(request , id):
     
     context.update({'attendance_records':page_obj , 'uid':id})
     return render(request, 'std_attendance.html' , context)
+  
+  
+  
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+
+def download_marksheet(request, user_id, exam_id):
+    user = User.objects.get(id = user_id)
+    # Fetch the student's marksheet
+    student = Student.objects.get(user = user)
+    exam = Examination.objects.get(id=exam_id)
+    subjectMarks = SubjectMarks.objects.filter(student=student, exam=exam)
+
+    # Create the HttpResponse object with the appropriate PDF headers.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="Marksheet-{student}-{exam_id}.pdf"'
+
+    # Using SimpleDocTemplate to add more sophistication
+    doc = SimpleDocTemplate(response, pagesize=letter)
+
+    # Styles for paragraphs
+    styles = getSampleStyleSheet()
+    styleH = styles['Heading1']
+    styleN = styles['Normal']
+
+    # List to hold elements to add to PDF
+    story = []
+
+    # Adding heading and student details
+    story.append(Paragraph('Marksheet', styleH))
+    story.append(Spacer(1, 12))
+    story.append(Paragraph(f'Student Name: {student.name}', styleN))
+    story.append(Paragraph(f'Exam Name: {exam.exam}', styleN))
+    story.append(Paragraph(f'Exam Date: {exam.date}', styleN))
+    story.append(Spacer(1, 12))
+
+    # Preparing data for table
+    data = [['Subject', 'Marks']]
+    for subject_mark in subjectMarks:
+        data.append([subject_mark.subject.sub_name, subject_mark.marks])
+
+    # Creating a table and adding it to story
+    t = Table(data)
+    t.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                           ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+                           ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                           ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                           ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+                           ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                           ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                           ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+    story.append(t)
+
+    # Building the PDF
+    doc.build(story)
+    return response
+

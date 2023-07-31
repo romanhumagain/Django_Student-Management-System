@@ -7,4 +7,5 @@ urlpatterns = [
   path('gradesheet/<int:id>/' , gradesheet , name="gradesheet"),
   path('std_assignment/<int:id>/' , view_assignment , name='std_assignment'),
   path('std_attendance/<int:id>/' , view_attendance , name="std_attendance"),
+  path('download/marksheet/<int:user_id>/<int:exam_id>/', download_marksheet, name='download_marksheet'),
 ]

@@ -140,15 +140,17 @@ def view_student(request):
     data = request.POST
     action = data.get('action')
     attachment = None
+    mail_list = []
     
     if action == "send_email":
       message = data.get('message')
       subject = data.get('subject')
       to_email = data.get('to')
+      mail_list.append(to_email)
       
       attachment = request.FILES.get('attachment')
       
-      send_email(to_email, subject, message , attachment)
+      send_email(mail_list, subject, message , attachment)
       messages.success(request , "successfully sent email")
       return redirect('/staff/view_student/')
     
@@ -235,6 +237,30 @@ def assignment(request):
     level = Level.objects.get(level = level)
     current_date = date.today()
     assignment = Assignment.objects.create(course = course , level = level , assignment = assignment , posted_date=current_date, due_date =due_date , due_time = due_time)
+    
+    email_address = []
+    students = Student.objects.filter(course = course , level = level)
+    
+    for student in students:
+      email = student.user.username
+      email_address.append(email)
+      
+    from datetime import datetime  # Note the corrected import statement
+    # parse the strings to datetime objects
+    due_date = datetime.strptime(due_date, '%Y-%m-%d')
+
+    # parse the string to a datetime object
+    due_time = datetime.strptime(due_time, '%H:%M')
+
+    # now you can format the datetime objects
+    formatted_due_date = due_date.strftime('%B %d, %Y')  # e.g., 'August 01, 2023'
+    formatted_due_time = due_time.strftime('%I:%M %p')  # e.g., '11:59 PM'
+
+    message = f"You have been assigned an assignment which has a deadline of <strong>{formatted_due_date} at {formatted_due_time}</strong>. Please ensure to complete and submit it by the given due date.<br>Kind Regards, <br>MySchool"
+    subject = "Regarding Assignment"
+    
+    
+    send_email(email_address , subject , message , attachment=None )
     messages.success(request , 'successfully posted assignment')
     return redirect('/staff/assignment/')
   
