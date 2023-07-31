@@ -287,7 +287,6 @@ def attendance(request):
             context.update({'students': students})
             
       if action == 'attendance':
-        
             course_inst = Course.objects.get(course=course)
             level_inst = Level.objects.get(level=level)
             
@@ -310,7 +309,10 @@ def attendance(request):
                 Attendance.objects.create(student=student, attendance=attendance_status, date=current_date)
             if absent_student_email:
               absent_mail(absent_student_email)
+              
+            messages.success(request,"Attendance successfully taken !!")
             return redirect('/staff/attendance/')
+          
     return render(request, 'attendance.html', context)
   
 @login_required(login_url='/')

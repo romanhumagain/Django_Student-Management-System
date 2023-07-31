@@ -57,10 +57,7 @@
           <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
           <button class="btn btn-outline-dark" type="submit">Search</button>
         </form>
-
       </div>
-      <div class="m-2"><a href="/student/signout/" class="btn btn-danger">Sign Out</a></div>
-
     </div>
   </nav>
 
@@ -91,7 +88,7 @@
       <table class="table table-striped table-hover shadow-lg m-4" style="font-size: small;">
         <thead>
           <tr>
-            <th scope="col" class="small">S.N</th>
+            <th scope="col" class="small"></th>
             <th scope="col" class="small">Name</th>
             <th scope="col" class="small">Email</th>
             <th scope="col" class="small">Address</th>
@@ -105,7 +102,16 @@
         <tbody>
           {% for data in querySet %}
           <tr>
-            <td>{{forloop.counter}}</td>
+            <td>
+              {% if data.profile_pic %}
+              <img src="/media/{{data.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg profile-img"
+                style="width: 45px; height: 45px;">
+              {% else %}
+              <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle profile-img"
+                style="width: 45px; height:45px;">
+              {% endif %}
+
+            </td>
             <td>{{data.name}}</td>
             <td>{{data.user.username}}</td>
             <td>{{data.address}}</td>
@@ -114,13 +120,17 @@
             <td>{{data.intake}}</td>
             <td>{{data.level}}</td>
             <td>
-              <a href="" class="btn btn-outline-danger send-email-btn" data-bs-toggle="modal"
-                data-bs-target="#mailModal" data-email="{{ data.user.username }}">Send Email</a>
+              <a href="" class="btn btn-outline-danger send-email-btn btn-sm" data-bs-toggle="modal"
+                data-bs-target="#mailModal" data-email="{{ data.user.username }}">
+                <i class="fas fa-envelope fa-ys"></i> <!-- FontAwesome mail icon -->
+              </a>
+
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+
 
       <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
@@ -136,13 +146,13 @@
             </a>
           </li>
           {% endif %}
-      
+
           <li class="page-item disabled">
             <a class="page-link">
               Page {{ querySet.number }} of {{ querySet.paginator.num_pages }}
             </a>
           </li>
-          
+
           {% if querySet.has_next %}
           <li class="page-item">
             <a class="page-link" href="?page={{ querySet.next_page_number }}" aria-label="Next">

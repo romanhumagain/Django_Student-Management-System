@@ -67,3 +67,12 @@ footer {
 .status-rejected {
   color: red;
 }
+footer{
+  margin-top: 20px;
+  color:#635d5d;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  background-color: white; 
+}
+ /*
