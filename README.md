@@ -24,11 +24,11 @@
 
   <li><b>Notice Board:</b> This system also includes a digital notice board feature. This allows administrators to post important announcements or updates. Students can check this notice board to stay informed about upcoming events, changes to the schedule, or other pertinent information.</li>
 </ul>
-<h2>Technology Stack</h2>
+<h2>Technology Used</h2>
 <p>This Student Management System has been developed using the following technologies:</p>
 <ul>
-  <li>Backend: Django</li>
-  <li>Frontend: HTML, CSS, JavaScript</li>
+  <li>Backend: <strong>Django</strong></li>
+  <li>Frontend: HTML, CSS, Bootstrap, JavaScript</li>
   <li>Database: MySQL</li>
   <li>Email Services: SMTP</li>
 </ul>
