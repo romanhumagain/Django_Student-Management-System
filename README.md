@@ -1,6 +1,6 @@
 <h1>Student Management System</h1>
 
-<p>This repository contains the code for a robust Student Management System, developed using the Django framework. The main goal of this system is to simplify and automate various aspects of student information management in educational institutions.</p>
+<p>This repository contains the code for Student Management System, developed using the Django framework. The main goal of this system is to simplify and automate various aspects of student information management in educational institutions.</p>
 
 <h2>Features</h2>
 
