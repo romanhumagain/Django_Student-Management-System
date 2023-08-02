@@ -27,7 +27,7 @@
 <h2>Technology Used</h2>
 <p>This Student Management System has been developed using the following technologies:</p>
 <ul>
-  <li>Backend: <strong>Django</strong></li>
+  <li>Backend: <strong>Python Django Framework</strong></li>
   <li>Frontend: HTML, CSS, Bootstrap, JavaScript</li>
   <li>Database: MySQL</li>
   <li>Email Services: SMTP</li>
