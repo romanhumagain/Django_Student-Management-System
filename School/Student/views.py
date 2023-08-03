@@ -2,7 +2,7 @@ from django.shortcuts import render , redirect
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.contrib import messages
 from django.contrib.auth import logout
 from  Staff . models import *
@@ -18,15 +18,19 @@ from django.db.models import Q
 
 
 @login_required(login_url='/')
-def student_dashboard(request , uid ):
-  user = User.objects.get(id = uid)
-  student = Student.objects.get(user = user)
+def student_dashboard(request , slug ):
+  try:
+    student = Student.objects.get(slug = slug)
+    user = student.user.id
+  except Student.DoesNotExist:
+    raise Http404("Student does not exist")
+  
   first_name, last_name = student.name.split(' ', 1)
   name = [first_name , last_name ]
   
   context = {'name':name}
   
-  user = User.objects.get(id = uid)
+  user = User.objects.get(id = user)
   profile = Profile.objects.get(user = user)
   
   is_verified = profile.is_verified
@@ -55,37 +59,42 @@ def student_dashboard(request , uid ):
     
   current_time = datetime.now().time()
   greeting = ""
+  greeting_icon = ""
+
   if current_time.hour < 12:
         greeting = "Good Morning"
+        greeting_icon = "fa-sun"
   elif 12 <= current_time.hour < 18:
         greeting = "Good Afternoon"
+        greeting_icon = "fa-sun"
   else:
         greeting = "Good Evening"
+        greeting_icon = "fa-moon"
   
-  context.update({'student':student ,'uid':uid , 'notices':notice, 'notice_count':notice_count , 'assignments':assignments , 'ass_count':ass_count , 'greeting':greeting})
+  context.update({'student':student ,'uid':slug , 'notices':notice, 'notice_count':notice_count , 'assignments':assignments , 'ass_count':ass_count , 'greeting':greeting , 'greeting_icon':greeting_icon})
   
   if not is_verified:
     context['verification_error'] = 'please verify your account'
   
   if request.method ==  'POST':
     action = request.POST.get('action')
+    
     if action == 'profile_pic':
       pic= request.FILES.get('profile_pic')
       student.profile_pic = pic
       student.save()
       # messages.success(request , 'Successfully Uploaded Profile Pic')
-      return redirect(f'/student/student_dashboard/{uid}')
+      return redirect(f'/student/student_dashboard/{slug}')
    
     if action == 'verify':
-      user = User.objects.get(id = uid)
-      email = user.username
+      email = student.user.username
       
       profile = Profile.objects.get(user = user)
       verification_token = profile.token
        
       send_verification(email , verification_token)
-      messages.success(request , 'successfully sent verification link' )
-      return redirect(f'/student/student_dashboard/{uid}')
+      messages.success(request , 'successfully sent verification link to your email address ' )
+      return redirect(f'/student/student_dashboard/{slug}')
     
     if action == "EditInfo":
       first_name = request.POST.get('firstName')
@@ -93,12 +102,11 @@ def student_dashboard(request , uid ):
       phone_no = request.POST.get('phoneNo')
       
       full_name = " ".join([first_name , last_name])
-      print(full_name)
       student.name =  full_name
       student.phone_no = phone_no
       student.save()
       
-      return redirect(f'/student/student_dashboard/{uid}/')
+      return redirect(f'/student/student_dashboard/{slug}/')
     
   return render(request , 'student dashboard.html' , context)
 
@@ -117,10 +125,9 @@ def verify_account(request , token):
     return HttpResponse('Sorry Couldnt Verify Your Account')
     print(str(e))
     
-def gradesheet(request, id):
+def gradesheet(request, slug):
     try:
-        user = User.objects.get(id=id)
-        student = Student.objects.get(user=user)
+        student = Student.objects.get(slug=slug)
         exams = Examination.objects.all().order_by('-id') 
         course = student.course
         level = student.level
@@ -152,11 +159,13 @@ def gradesheet(request, id):
                 'percentage': percentage,
                 'rank': rank,
             })
-
+        name = student.name
+        first_name = name.split()[0]
         context = {
             'student': student,
             'results': results,
-            'uid': id,
+            'uid': slug,
+            'first_name' :first_name
         }
 
         notice = Notice.objects.all()
@@ -193,9 +202,8 @@ def gradesheet(request, id):
     except Student.DoesNotExist:
         return HttpResponse('Student Not Found!')
   
-def view_assignment(request , id):
-  user = User.objects.get(id= id)
-  student = Student.objects.get(user = user)
+def view_assignment(request , slug):
+  student = Student.objects.get(slug = slug)
   context = {}
   
   current_date = date.today()
@@ -221,7 +229,7 @@ def view_assignment(request , id):
       assignment_status = "Submitted"
       
     assignment_submission =SubmittedAssignment.objects.create(student = student , assignment = assignment ,submitted_date = current_date, submitted_time = current_time ,submitted_assignment = assignment_file , assignment_description = assignment_description , submission_status =assignment_status )
-    return redirect('std_assignment' , id = id)
+    return redirect('std_assignment' , slug = slug)
   
   notice = Notice.objects.all()
   notice_count = notice.count()
@@ -248,14 +256,13 @@ def view_assignment(request , id):
   ass_count = assignments.count()
 
   assignment_submissions = SubmittedAssignment.objects.filter(student = student)
-  context.update({'student':student ,'uid':id ,'assignments':assignments  , 'notice_count':notice_count , 'ass_count':ass_count , 'submitted_assignments':assignment_submissions})
+  context.update({'student':student ,'uid':slug ,'assignments':assignments  , 'notice_count':notice_count , 'ass_count':ass_count , 'submitted_assignments':assignment_submissions})
   
   return render(request , 'std_assignment.html' , context)
 
-def view_attendance(request , id):
+def view_attendance(request , slug):
     context = {}
-    user = User.objects.get(id = id)
-    student = Student.objects.get(user = user)
+    student = Student.objects.get(slug = slug)
     attendance_records = Attendance.objects.filter(student = student).order_by('-date')
     
     paginator = Paginator(attendance_records, 3)
@@ -308,7 +315,7 @@ def view_attendance(request , id):
        
     context.update({'notice_count':notice_count , 'ass_count':ass_count})
     
-    context.update({'attendance_records':page_obj , 'uid':id})
+    context.update({'attendance_records':page_obj , 'uid':slug})
     return render(request, 'std_attendance.html' , context)
   
   

@@ -1,0 +1,99 @@
+
+.logo {
+  /* margin-left: 10px; */
+  width: 75px;
+  height: 75px;
+  background-color: #f06292;
+
+  /* Set your desired background color */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #0c0c0c;
+  /* Set your desired text color */
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.logo-highlight {
+  color: #0cd0cd;
+  margin-left: 4px;
+  /* Set your desired highlight color */
+}
+.certificate-container {
+  max-width: 800px;
+  padding: 30px 20px;
+  border: 2px solid #ddd;
+  margin: auto;
+  box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.certificate-container:after {
+  content: "";
+  display: block;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: url('{% static "images/certificate_seal.png" %}') center no-repeat;
+  background-size: contain;
+}
+
+.certificate-header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #333;
+}
+
+.certificate-header h2 {
+  font-size: 2.5em;
+  margin-bottom: .2em;
+}
+
+.certificate-header h3 {
+  font-size: 1.5em;
+  color: #666;
+  margin-bottom: 1em;
+}
+
+.certificate-body {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #666;
+  font-size: 1.2em;
+  line-height: 1.6em;
+}
+
+.certificate-signature {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+}
+
+.certificate-signature div {
+  text-align: center;
+}
+
+.certificate-signature img {
+  height: 50px;
+}
+
+.certificate-signature p {
+  border-top: 1px solid #000;
+  margin-top: 40px;
+  padding-top: 10px;
+  font-size: .8em;
+}
+footer {
+  color: #766f6f;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  }

@@ -25,7 +25,7 @@ class Student(models.Model):
   user = models.OneToOneField(User , on_delete=models.CASCADE , null=True)
   course = models.ForeignKey(Course , on_delete=models.CASCADE)
   level = models.ForeignKey(Level, default=None, on_delete=models.CASCADE)
-  # slug = models.SlugField(unique=True , null=True , default=None)
+  slug = models.SlugField(unique=True , null=True , default=None)
   student_id = models.IntegerField(unique=True)
   name = models.CharField(max_length=100)
   phone_no = models.CharField(max_length=20)
@@ -34,10 +34,11 @@ class Student(models.Model):
   intake = models.CharField(max_length=100)
   profile_pic = models.ImageField(upload_to='profile_pic', null=True)
   
-  # def save(self ,*args , **kwargs):
-  #   self.slug = generate_slugs(self.name)
-  #   super(Student , self).save(*args , **kwargs)
-  
+  def save(self, *args, **kwargs):
+    if not self.pk:
+        self.slug = generate_slugs(self.name)
+    super(Student, self).save(*args, **kwargs)
+    
   def __str__(self):
     return self.name
   
@@ -56,12 +57,19 @@ class Assignment(models.Model):
   course = models.ForeignKey(Course, on_delete=models.CASCADE)
   level = models.ForeignKey(Level, on_delete=models.CASCADE)
   assignment = models.TextField(max_length=500)
+  slug = models.SlugField(unique=True , null=True , default=None)
   posted_date = models.DateField(default=None)
   due_date = models.DateField(default=None)
   due_time = models.TimeField(default=None)
   
   def __str__(self) -> str:
     return self.assignment
+  
+  def save(self , *args , **kwargs):
+    if not self.pk:
+      self.slug =generate_slugs(self.assignment)
+    super (Assignment , self).save(*args , **kwargs)
+    
   
 class Attendance(models.Model):
   student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -95,12 +103,14 @@ class SubjectMarks(models.Model):
 
 class TotalMark(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, default=None, null=True)
+    level = models.ForeignKey(Level , null=True, default=None , on_delete=models.CASCADE)
+    course = models.ForeignKey(Course , null=True, default=None , on_delete=models.CASCADE)
     exam = models.ForeignKey(Examination, on_delete=models.CASCADE, default=None, null=True)
     total_mark = models.IntegerField(null=True, default=0)
     rank = models.IntegerField(null=True, default=0)
 
     class Meta:
-        unique_together = ['student', 'exam']
+        unique_together = ['course','level','student', 'exam']
         
 class SubmittedAssignment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)

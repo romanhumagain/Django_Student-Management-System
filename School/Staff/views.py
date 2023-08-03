@@ -65,8 +65,15 @@ def student_registration(request):
   String = upper_case+lower_case+digits
   length = 12
   password = "".join(random.sample(String,length))
-  student_id = "".join(random.choices(string.digits, k=4))
   
+  last_student = Student.objects.all().order_by('-student_id').first()
+  
+  if last_student is None:
+    student_id = "".join(random.choices(string.digits, k=4))
+  
+  else:
+    student_id = int(last_student.student_id)+1
+ 
   if request.method == 'POST':
     data = request.POST
     
@@ -114,7 +121,7 @@ def view_student(request):
   context = {}
   action = request.GET.get('action')
   
-  paginator = Paginator(student , 2)
+  paginator = Paginator(student , 5)
   page_number = request.GET.get('page' , 1)
   page_obj = paginator.get_page(page_number)
   
@@ -264,7 +271,7 @@ def assignment(request):
     messages.success(request , 'successfully posted assignment')
     return redirect('/staff/assignment/')
   
-  assignment = Assignment.objects.all()
+  assignment = Assignment.objects.all().order_by('level')
   context = {'assignments':assignment}
   return render( request, 'assignment.html', context)
 
@@ -348,24 +355,27 @@ def grades(request):
     
     global selected_exam
     global level
-    
+    global course 
     if request.method == 'POST':
         data = request.POST
         selected_exam = data.get('exam')
         level = data.get('level')
         Std_name = data.get('student')
         action = data.get('action')
-        course = ""
         
         context.update({"level":level , 'selected_exam':selected_exam})
 
-        if action == "bsc":
+        if action == "BSC Hons":
             course = "BSC Hons"
-        elif action == "bba":
+        elif action == "BBA Hons":
             course = "BBA Hons"
         
-        students = Student.objects.filter(level__level__contains=level, course__course__contains=course)
-        subjects = Subject.objects.filter(level__level__contains=level, course__course__contains=course)
+        level_obj = Level.objects.get(level = level)
+        print(f"Course: {course}")  # Debug line
+        course_obj = Course.objects.get(course = course)
+        
+        students = Student.objects.filter(level=level_obj, course=course_obj)
+        subjects = Subject.objects.filter(level=level_obj, course=course_obj)
         
         students_not_in_marks = students.exclude(subjectmarks__exam__exam__contains=selected_exam)
              
@@ -374,18 +384,22 @@ def grades(request):
         if action == 'submit':
             exam = Examination.objects.get(exam = selected_exam)
             student = Student.objects.get(id = Std_name)
-            subjects = Subject.objects.filter(level__level__contains="Level 4", course__course__contains=course)
+            subjects = Subject.objects.filter(level=level_obj, course=course_obj)
             marks_list = []
-            for subject in subjects:
-                marks = int(request.POST.get(f"subject{subject.sub_name}"))
-                subjectMarks = SubjectMarks.objects.create(student = student , subject = subject , exam = exam , marks = marks)
-                marks_list.append(marks)
-                
+            if course_obj is not None:
+              for subject in subjects:
+                  marks = int(request.POST.get(f"subject{subject.sub_name}"))
+                  subjectMarks = SubjectMarks.objects.create(student = student , subject = subject , exam = exam , marks = marks)
+                  marks_list.append(marks)
+            else:
+                print(f"No Course found with the name: {course}")
+                # Handle this case in some way, perhaps by returning an error message in the context
+
             total_marks = sum(marks_list)
-            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks , exam = exam)
+            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks , exam = exam , level=level_obj, course=course_obj)
 
             if not students_not_in_marks:
-              totalMarkObj = TotalMark.objects.filter(exam = exam).order_by('-total_mark')
+              totalMarkObj = TotalMark.objects.filter(exam = exam , level=level_obj, course=course_obj).order_by('-total_mark')
               
               previous_total_mark = None
               previous_rank = 0
@@ -445,9 +459,9 @@ def view_grades(request):
     return render(request, 'view grades.html', context)
 
 @login_required(login_url='/')
-def view_marksheet(request, id):
+def view_marksheet(request, slug):
     exams = Examination.objects.all().order_by('-id')
-    student = Student.objects.get(id=id)  # Get the selected student
+    student = Student.objects.get(slug=slug)  # Get the selected student
     course = student.course
     level = student.level
     
@@ -488,14 +502,16 @@ def view_marksheet(request, id):
         'percentage':percentage,
         'rank':rank
       })
+      first_name = student.name.split()[0]
       context .update({
         'results':results,
         'student':student,
+        'first_name': first_name,
                  })
     return render(request, 'marksheet.html', context)
   
-def view_submission(request, id):
-    assignment = Assignment.objects.get(id=id)
+def view_submission(request, slug):
+    assignment = Assignment.objects.get(slug=slug)
     submitted_assignment = SubmittedAssignment.objects.filter(assignment=assignment)
 
     paginator = Paginator(submitted_assignment , 5)

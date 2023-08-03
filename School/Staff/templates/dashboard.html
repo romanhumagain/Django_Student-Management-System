@@ -1,14 +1,65 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Staff Dashboard{% endblock %}
-<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'css/newbase.css' %}"> -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 {% block search %}
  <li class="nav-item" style="margin-left: 500px;" >
-  <a href="/student/signout/" class="btn btn-danger">Sign Out</a>
+  <a href="/student/signout/" class="btn btn-outline-danger">Sign Out</a>
 </li>  
 {% endblock%}
+{% block css %}
+<style>
+
+.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.list-group-item {
+  border: none;
+  padding: 15px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.list-group-item i {
+  color: #f06292;
+  margin-right: 10px;
+}
+.card-header h2, .card-header h3 {
+  color: #ffffff;
+}
+
+.btn-warning {
+  color: #ffffff;
+  background-color: #f5a623;
+  border-color: #f5a623;
+}
+
+.btn-warning:hover {
+  color: #ffffff;
+  background-color: #d48516;
+  border-color: #d48516;
+}
+
+.form-group label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.list-group-item {
+  padding: 10px 15px;
+}
+
+</style>
+{% endblock %}
+
 {% block body %}
 {% if messages %}
   {% for message in messages %}
@@ -24,98 +75,84 @@
   <div class="container">
     <div class="row">
       <div class="col-md-6">
-        <h1>Welcome to the Student Management System</h1>
-        <p>This system allows you to manage students and their information efficiently.</p>
-        <h2>Features</h2>
-        <ul>
-          <li>Manage student records</li>
-          <li>Attendance tracking</li>
-          <li>Notice board for important announcements</li>
-          <li>Search for student attendance by date</li>
+        <h1 style="text-shadow: 2px 2px 5px #aaa;">Welcome to the Student Management System</h1>
+        <p class="lead">This system allows you to manage students and their information efficiently.</p>
+        <h2 class="mt-5 mb-4">Features</h2>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><i class="fas fa-users-cog"></i> Manage student records</li>
+          <li class="list-group-item"><i class="fas fa-user-check"></i> Attendance tracking</li>
+          <li class="list-group-item"><i class="fas fa-bullhorn"></i> Notice board for important announcements</li>
+          <li class="list-group-item"><i class="fas fa-search"></i> Search for student attendance by date</li>
           <!-- Add more features here as needed -->
         </ul>
-      </div>
-      <div class="col-md-6">
-        <div class="card shadow-lg">
-          <div class="card-header" style="background-color:#f5a623 ;">
-            <h2>Notice Board</h2>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card shadow-lg">
+          <div class="card-header" style= "background-color:#0cb1af ;">
+              <h2><i class="fas fa-bullhorn"></i> Notice Board</h2>
           </div>
           <div class="card-body">
-            <form action="" method="POST">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="notice">Add Notice:</label>
-                <textarea class="form-control" id="notice" name="notice" rows="3" required></textarea>
-              </div>
-              <button type="submit" name = "action" value="post_notice" class="btn btn-primary m-2">Post Notice</button>
-            </form>
+              <form action="" method="POST">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label for="notice"><i class="fas fa-edit"></i> Add Notice:</label>
+                      <textarea class="form-control" id="notice" name="notice" rows="3" required></textarea>
+                  </div>
+                  <button type="submit" name="action" value="post_notice" class="btn btn-info m-2">Post Notice</button>
+                  
+              </form>
           </div>
-        </div>
-        <div class="card mt-4 shadow">
+      </div>
+      <div class="card mt-4 shadow">
           <div class="card-header bg-secondary text-white">
-            <h3>Recent Notices:</h3>
+              <h3><i class="fas fa-clipboard-list"></i> Recent Notices:</h3>
           </div>
           <div class="card-body">
-            <ul class="list-group">
-              {% for notice in notices %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ notice.notice }}.</span>
-                <a href="/staff/delete_notice/{{notice.id}}/" class="btn-close" aria-label="Close"></a>
-              </li>
-              {% empty %}
-              <li class="list-group-item">No notices posted yet.</li>
-              {% endfor %}
-            </ul>
+              <ul class="list-group">
+                  {% for notice in notices %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                      <span>{{ notice.notice }}.</span>
+                      <a href="/staff/delete_notice/{{notice.id}}/" class="btn-close" aria-label="Close"></a>
+                  </li>
+                  {% empty %}
+                  <li class="list-group-item">No notices posted yet.</li>
+                  {% endfor %}
+              </ul>
           </div>
-        </div>
       </div>
+  </div>
+  
     </div>
     <hr>
     <div class="row">
       <div class="col-md-6">
-        <div class="card shadow">
-          <div class="card-header" style="background-color:#0cb1af">
-            <h2>Attendance Search</h2>
-          </div>
-          <div class="card-body">
-            <form action="" method="POST">
-              {% csrf_token %}
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="name" name="name" placeholder="name" required>
-                <label for="name">Name</label>
+          <div class="card shadow">
+              <div class="card-header" style="background-color:#0cb1af">
+                  <h2><i class="fas fa-search"></i> Attendance Search</h2>
               </div>
-              <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="stdid" name="stdid" placeholder="std id" required>
-                <label for="stdid">Student ID</label>
+              <div class="card-body">
+                  <form action="" method="POST">
+                      {% csrf_token %}
+                      <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="name" name="name" placeholder="name" required>
+                          <label for="name"><i class="fas fa-user"></i> Name</label>
+                      </div>
+                      <div class="form-floating mb-3">
+                          <input type="text" class="form-control" id="stdid" name="stdid" placeholder="std id" required>
+                          <label for="stdid"><i class="fas fa-id-card"></i> Student ID</label>
+                      </div>
+                      <div class="form-floating mb-3">
+                          <input type="date" class="form-control" id="date" name="date" placeholder="dob" required>
+                          <label for="date"><i class="fas fa-calendar"></i> Search Date</label>
+                      </div>      
+                      <button type="submit" name="action" value="search" class="btn btn-info m-2">Search</button>
+                  </form>
               </div>
-              <div class="form-floating mb-3">
-                <input type="date" class="form-control" id="date" name="date" placeholder="dob" required>
-                <label for="date">Search Date</label>
-              </div>      
-              <button type="submit" name = "action" value="search" class="btn btn-primary m-2">Search</button>
-            </form>
           </div>
-        </div>
-        {% if attendance %}
-        <div class="card mt-4 shadow-lg">
-          <div class="card-header bg-secondary text-white">
-            <h3>Attendance Status for {{ date }}:</h3>
-          </div>
-          <div class="card-body">
-            <ul class="list-group">
-              {% for student, status in attendance.items %}
-              <li class="list-group-item">
-                {{ student }} - {{ status }}
-              </li>
-              {% empty %}
-              <li class="list-group-item">No attendance records found for the specified date.</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        {% endif %}
       </div>
-    </div>
+  </div>
+  
   </div>
 </main>
 {% endblock %}

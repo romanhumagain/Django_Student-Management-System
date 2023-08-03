@@ -11,6 +11,6 @@ urlpatterns = [
   path('attendance/', attendance , name='attendance' ),
   path('grades/' , grades , name='grades'),
   path('view_grades/' , view_grades , name='view_grades'),
-  path('view_marksheet/<int:id>/' , view_marksheet , name='view_marksheet'),
-  path('view_submission/<int:id>/', view_submission , name='view_submission'),
+  path('view_marksheet/<slug:slug>/' , view_marksheet , name='view_marksheet'),
+  path('view_submission/<slug:slug>/', view_submission , name='view_submission'),
 ]

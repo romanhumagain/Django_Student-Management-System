@@ -76,6 +76,7 @@
   <form method="POST" class="card p-4 shadow-lg m-2" style="max-width: 420px;">
     {% csrf_token %}
     <div class="d-flex justify-content-center mb-1">
+      <label for="level" class="form-label " style="margin-top: 17px;"><i class="fas fa-layer-group "></i></label>
       <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
         {% if not level %}
         <option selected>Select Level</option>
@@ -115,7 +116,7 @@
         <td>{{forloop.counter}}</td>
         <td>{{student.name}}</td>
         <td>{{student.student_id}}</td>
-        <td><a href="/staff/view_marksheet/{{student.id}}/">View Marks</a></td>
+        <td><a href="/staff/view_marksheet/{{student.slug}}/">View Marks</a></td>
       </tr>
       {% endfor %}
     </tbody>

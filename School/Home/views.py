@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate , login
 from Staff.models import *
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 from django.http import HttpResponse
@@ -31,8 +32,16 @@ def index(request):
             login(request, authenticated_user)
             try:
                 user_type = UserType.objects.get(user=authenticated_user).user_type
+                
                 if user_type == 'student':
-                    return redirect('student_dashboard' , authenticated_user.id)
+                    try:
+                        student_obj = Student.objects.get(user = authenticated_user)
+                
+                    except ObjectDoesNotExist:
+                        return HttpResponse("Student Doesn't Exists")
+                
+                    print()
+                    return redirect('student_dashboard' , student_obj.slug)
                 elif user_type == 'staff':
                     return redirect('/staff/staff_dashboard/')     
             except:

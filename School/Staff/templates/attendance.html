@@ -1,29 +1,50 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %} Attendence {% endblock %}
+{% block title %} Attendance {% endblock %}
 <link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% block css %}
+<style>
+  .title {
+  background-color: #0cb1af;
+  text-align: center;
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease 0s;
+}
+
+.title:hover {
+  background-color: #1a9793;
+  box-shadow: 0px 15px 20px rgba(91, 208, 161, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
+}
+</style>
+{% endblock %}
 {% block body %}
 {% if messages %}
-{% for message in messages %} 
+{% for message in messages %}
 {% if message.tags == "error" %}
-<div class="alert alert-danger">{{message}}</div>
+<div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{message}}</div>
 {% endif %}
-
 {% if message.tags == "success" %}
-<div class="alert alert-success">{{message}}</div>
+<div class="alert alert-success"><i class="fas fa-check-circle"></i> {{message}}</div>
 {% endif %}
 {% endfor %}
 {% endif %}
 <div class="container">
   <form method="POST">
     {% csrf_token %}
-        <h2 class="p-1" style="background-color: #0cb1af; text-align: center;">Attendance Dashboard</h2>
-        <div class="date-time p-1 " style="background-color: #000000; color: white; margin-left: 1120px;">
-          {{ current_date_and_time}}
-      </div>
-        <div class="card m-2 shadow-lg" style="width: 400px;">
-            <div class="card-body">
-                <h5 class="card-title">Select Course</h5>
+    <div class="container">
+      <h2 class="p-3 title"><i class="fas fa-calendar-check"></i> Attendance Dashboard</h2>
+    </div>
+    <div class="date-time p-1 " style="background-color: #000000; color: white; margin-left: 1090px;">
+      <i class="fas fa-clock"></i> {{ current_date_and_time}}
+    </div>
+    <div class="card m-2 shadow-lg" style="width: 400px;">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-book"></i> Select Course</h5>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="course" id="bsc" value="BSC Hons">
                   <label class="form-check-label" for="bsc">
@@ -40,7 +61,7 @@
         </div>
         <div class="card m-2 shadow-lg" style="width: 400px;">
             <div class="card-body">
-                <h5 class="card-title">Select Class</h5>
+              <h5 class="card-title"><i class="fas fa-layer-group"></i> Select Level</h5>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="level" id="l4" value="Level 4">
                     <label class="form-check-label" for="l4">
@@ -61,8 +82,7 @@
                 </div>
             </div>
         </div>
-        <button type="submit"  name="action" value = "sort" class="btn btn-primary m-2">Take Attendance</button>
-      </form>
+        <button type="submit" name="action" value = "sort" class="btn btn-primary m-2"><i class="fas fa-user-check"></i> Take Attendance</button></form>
     </div>
     {% if students %}
     <hr>
@@ -93,7 +113,7 @@
             {% endfor %}
           </tbody>
         </table>
-    <button type="submit" name="action" value = "attendance" class="btn btn-primary" style="margin-left:1200px;">Submit</button>
+    <button type="submit" name="action" value = "attendance" class="btn btn-primary" style="margin-left:1080px;"><i class="fas fa-user-check"  ></i> Take Attendance</button>
   </form>
 </div>
 {% endif %}

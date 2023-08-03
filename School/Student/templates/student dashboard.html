@@ -143,28 +143,38 @@
         </nav>
       </div>
       <div class="col-lg-10 offset-lg-2">
+        <div class="container">
         {% if messages %}
         {% for message in messages %}
         {% if message.tags == 'success' %}
-        <div class="alert alert-success">{{message}}</div>
+        <div class="alert alert-success m-3">{{message}}</div>
         {% endif %}
         {% endfor %}
         {% endif %}
-        <div class="container">
-          <div class="card shadow-lg " style="width: 850px; margin-left: 120px; margin-top: 10px; ">
-            <div class="card-header">
-              <h4 class="text-center p-2" style="background-color:#0cb1af; color: white; padding: 9px;"><span
-                  class="greeting p-1" style="font-size: x-large;"> {{greeting}}!</span> <span class="name"
-                  style="font-size: large;"> {{student.name}}</span></h4>
-              {% if verification_error %}
-              <div class="alert alert-danger d-flex justify-content-between align-items-center">
-                <div>{{verification_error}}</div>
-                <form method="post">
-                  {% csrf_token %}
-                  <button type="submit" name="action" value="verify" class="btn btn-primary">Verify</button>
+          {% if verification_error %}
+            <div class="alert alert-danger d-flex justify-content-between align-items-center m-3">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                    <div>{{verification_error}}</div>
+                </div>
+                <form method="post" class="d-flex align-items-center">
+                    {% csrf_token %}
+                    <button type="submit" name="action" value="verify" class="btn btn-primary">
+                        <i class="fas fa-check-circle me-2"></i>send verification link
+                    </button>
                 </form>
-              </div>
-              {% endif %}
+            </div>
+            {% endif %}
+          <div class="card shadow-lg " style="width: 850px; margin-left: 120px; margin-top: 10px; ">
+            <div class="card-header" style=" background-color:#0cb1af; color: white; padding: 9px;" >
+              <h4 class="text-center p-2" >
+                <span class="greeting p-1" style="font-size: x-large;">
+                    <i class="fas {{greeting_icon}}"></i> {{greeting}}!
+                </span>
+                <span class="name" style="font-size: large;">
+                     {{student.name}}
+                </span>
+            </h4>
             </div>
             <div class="card-body">
               <div class="row">
@@ -232,16 +242,21 @@
         </div>
         <hr>
         <div class="container">
-          <div class="card mt-4  shadow justify-content-center"
-            style="width: 700px; height: 200px; margin-left: 200px;">
-            <div class="card-header bg-secondary text-white">
-              <h3 id="notice-details">Recent Notices:</h3>
+          <div class="card mt-4 shadow justify-content-center" style="width: 700px; margin-left: 200px;">
+            <div class="card-header bg-secondary text-light">
+              <h3 id="notice-details"><i class="fas fa-clipboard-list mr-2"></i>Recent Notices:</h3>
             </div>
             <div class="card-body">
               <ul class="list-group">
                 {% for notice in notices %}
-                <li class="list-group-item d-flex ">
-                  <span>{{ notice.notice }}.</span>
+                <li class="list-group-item d-flex align-items-center">
+                  <span class="badge bg-primary mr-3 rounded-circle p-2">
+                    <i class="fas fa-bell text-white"></i>
+                  </span>
+                  <div class="notice-text mr-auto">
+                    <p class="mb-0">{{ notice.notice }}.</p>
+                    <small class="text-muted">Posted on {{ notice.posted_date | date:"F d, Y" }}</small>
+                  </div>
                 </li>
                 {% empty %}
                 <li class="list-group-item">No notices posted yet.</li>
@@ -250,6 +265,7 @@
             </div>
           </div>
         </div>
+        
 
         <script>
           // Smooth scrolling to BBA Details section

@@ -42,13 +42,15 @@ def send_email(to_email , subject , message , attachment):
     email.content_subtype = 'html'
     email.send()
    
-def generate_slugs(title:str) ->str:
+
+
+def generate_slugs(name:str) ->str:
     from . models import Student
-    title = slugify(title)
-   
-    while(Student.objects.filter(slug = title)).exists():
-        title = f'{slugify(title)}-{str(uuid.uuid4())[:4]}'
-        
+    title = slugify(f"{name}-{uuid.uuid4()}")
+
+    while(Student.objects.filter(slug=title).exists()):
+        title = slugify(f"{name}-{uuid.uuid4()}")
+
     return title
-    
+
 
