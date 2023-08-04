@@ -1,0 +1,32 @@
+.logo {
+  margin-left: 10px;
+  width: 75px;
+  height: 75px;
+  background-color: #f06292;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.logo-text {
+  color: #0c0c0c;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.logo-highlight {
+  color: #09cee3;
+  margin-left: 4px;
+}
+
+footer{
+  margin-top: 20px;
+  color:#635d5d;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  background-color: white; 
+}

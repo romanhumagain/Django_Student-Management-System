@@ -1,10 +1,11 @@
 from django.http import HttpResponse
 import datetime
-from django.shortcuts import render , redirect
+from django.shortcuts import get_object_or_404, render , redirect
 from Staff.models import *
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from . utils import *
 import random , string
 from django.db.models import Q
@@ -12,24 +13,19 @@ from datetime import date
 from django.core.exceptions import ObjectDoesNotExist
 import uuid
 from django.db.models import Sum , Q
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator 
+from django.views import View
 
 
-@login_required(login_url="/")
-def staff_dashboard(request):
+@method_decorator(login_required(login_url='/') , name='dispatch')
+class StaffDashboard(View):
   
-  if request.method == 'POST':
-    data = request.POST
+  def get(self, request):
+    data = request.GET
     action = data.get('action')
-    
-    if action == "post_notice":
-      notice =data.get('notice')
-      notice = Notice.objects.create(notice = notice)
-  
-    # for searching attendance
-    if action == "search":
+    if action == 'search':
       name = data.get('name')
-      date = data.get('date')
+      search_date = data.get('date')
       stdid = data.get('stdid')
       
       try:
@@ -38,45 +34,58 @@ def staff_dashboard(request):
           messages.error(request , name +" with student id-"+stdid+" doesn't exists" )
           return redirect("/staff/staff_dashboard/")
       try:  
-        attendance = Attendance.objects.get(student = student , date = date)
+        attendance = Attendance.objects.get(student = student , date = search_date)
       except ObjectDoesNotExist:
-          messages.error(request , "Attendance not taken on "+date )
+          messages.error(request , "Attendance not taken on "+search_date )
           return redirect("/staff/staff_dashboard/")
       
       attendance_status = attendance.attendance  
       if attendance_status == "Present":
-          messages.success(request , name+" was Present on "+date )
+          messages.success(request , name+" was Present on "+search_date )
           return redirect('/staff/staff_dashboard/')
       else:
-          messages.error(request , name+" was Absent on "+date )
+          messages.error(request , name+" was Absent on "+search_date )
           return redirect('/staff/staff_dashboard/')
-        
-  notice = Notice.objects.all()
-  context = {'notices':notice}
-  return render(request, 'dashboard.html',context)
-
-@login_required(login_url='/')
-def student_registration(request):
-  
-  upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-  lower_case = " abcdefghijklmnopqrstuvwxyz"
-  digits = "123456789"
-  
-  String = upper_case+lower_case+digits
-  length = 12
-  password = "".join(random.sample(String,length))
-  
-  last_student = Student.objects.all().order_by('-student_id').first()
-  
-  if last_student is None:
-    student_id = "".join(random.choices(string.digits, k=4))
-  
-  else:
-    student_id = int(last_student.student_id)+1
- 
-  if request.method == 'POST':
-    data = request.POST
     
+    notice = Notice.objects.all()
+    context = {'notices':notice}
+    return render(request, 'dashboard.html',context)
+  
+  def post (self , request):
+    data = request.POST
+    action = data.get('action')
+    
+    if action == "post_notice":
+      notice = data.get('notice')
+      posted_date = date.today()
+      print(posted_date)
+      notice = Notice.objects.create(notice = notice, posted_date=posted_date)
+      return redirect('/staff/staff_dashboard/')
+      
+    return render(request, 'dashboard.html',{})
+
+@method_decorator(login_required(login_url='/') , name='dispatch')
+class StudentRegistration(View):
+  def get(self , request):
+    
+    return render(request , 'registration.html')
+  def post(self , request):
+    upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    lower_case = " abcdefghijklmnopqrstuvwxyz"
+    digits = "123456789"
+    
+    String = upper_case+lower_case+digits
+    length = 12
+    password = "".join(random.sample(String,length))
+    
+    last_student = Student.objects.all().order_by('-student_id').first()
+    
+    if last_student is None:
+      student_id = "".join(random.choices(string.digits, k=4))
+    else:
+      student_id = int(last_student.student_id)+1
+  
+    data = request.POST
     name = data.get('name')
     email = data.get('email')
     phone = data.get('phone')
@@ -85,116 +94,72 @@ def student_registration(request):
     dob = data.get('dob')
     intake =data.get('intake')
     level = data.get('level')
-    
+      
     user = User.objects.create(username = email)
     user.set_password("romanroman")
     user.save()
-    
+      
     userType = UserType.objects.create(user = user)
-    
+      
     profile = Profile.objects.create(user = user , token = str(uuid.uuid4()))
-    
+      
     course = Course.objects.get(course = course)
     level = Level.objects.get(level = level)
-    
+      
     student = Student.objects.create(
-      user = user,
-      student_id = student_id,
-      name= name,
-      phone_no = phone,
-      dob = dob,
-      address = address,
-      course = course,
-      intake = intake,
-      level = level,
-    )
-    
-    # send_password(email , password , intake)
+        user = user,
+        student_id = student_id,
+        name= name,
+        phone_no = phone,
+        dob = dob,
+        address = address,
+        course = course,
+        intake = intake,
+        level = level,
+      )
+      
+    send_password(email , password , intake)
     messages.success(request , f'Successfully Registered {name}')
     return redirect('/staff/student_registration/')
-  
-  return render(request , 'registration.html')
-
-@login_required(login_url='/')
-def view_student(request):
-  student = Student.objects.all().order_by('level__level')
-  context = {}
-  action = request.GET.get('action')
-  
-  paginator = Paginator(student , 5)
-  page_number = request.GET.get('page' , 1)
-  page_obj = paginator.get_page(page_number)
-  
-  
-  if action == "all":
-    student = Student.objects.all().order_by('level__level')
-  if action == "bsc": 
-    student = Student.objects.filter(course__course__icontains = 'BSC Hons').order_by('level__level')
-  if action == "bba": 
-    student = Student.objects.filter(course__course__icontains = 'BBA Hons').order_by('level__level') 
-  
-  search = request.GET.get('search')
-  
-  if search:
-    page_obj = student.filter( Q(name__icontains = search)|
-                              Q(level__level__icontains = search ))
-  if not student:
-    context['error_message'] = 'No result found !'
     
-  context.update({'querySet':page_obj})
+    return render(request , 'registration.html')
+
+
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class CourseDetails(View):
   
-  if request.method == "POST":
-    data = request.POST
-    action = data.get('action')
-    attachment = None
-    mail_list = []
-    
-    if action == "send_email":
-      message = data.get('message')
-      subject = data.get('subject')
-      to_email = data.get('to')
-      mail_list.append(to_email)
-      
-      attachment = request.FILES.get('attachment')
-      
-      send_email(mail_list, subject, message , attachment)
-      messages.success(request , "successfully sent email")
-      return redirect('/staff/view_student/')
-    
-  return render(request , 'view student.html' , context)
+  def get(self , request):
+    bsc_count = Student.objects.filter(course__course = "BSC Hons").count()
+    bsc_l4 = Student.objects.filter(course__course="BSC Hons", level__level="Level 4").count()
+    bsc_l5 = Student.objects.filter(course__course="BSC Hons", level__level="Level 5").count()
+    bsc_l6 = Student.objects.filter(course__course="BSC Hons", level__level="Level 6").count()
 
-@login_required(login_url='/')
-def course_details(request):
+    bba_count = Student.objects.filter(course__course="BBA Hons").count()
+    bba_l4 = Student.objects.filter(course__course="BBA Hons", level__level="Level 4").count()
+    bba_l5 = Student.objects.filter(course__course="BBA Hons", level__level="Level 5").count()
+    bba_l6 = Student.objects.filter(course__course="BBA Hons", level__level="Level 6").count()
+
+    bsc_subjects = Subject.objects.filter(course__course = 'BSC Hons').order_by('level__level')
+    levels = Level.objects.values_list('level' , flat=True).order_by('level')
+    context = {
+              'bbs_data':{
+                'count': bsc_count,
+                'bsc_l4':bsc_l4,
+                'bsc_l5':bsc_l5,
+                'bsc_l6':bsc_l6
+                },
+              'bba_data':{
+                'count': bba_count,
+                'bba_l4':bba_l4,
+                'bba_l5':bba_l5,
+                'bba_l6':bba_l6
+              },
+              'bsc_subjects':bsc_subjects,
+              'levels':levels
+              }
+    return render(request , 'course.html' , context)
   
-  bsc_count = Student.objects.filter(course__course = "BSC Hons").count()
-  bsc_l4 = Student.objects.filter(course__course="BSC Hons", level__level="Level 4").count()
-  bsc_l5 = Student.objects.filter(course__course="BSC Hons", level__level="Level 5").count()
-  bsc_l6 = Student.objects.filter(course__course="BSC Hons", level__level="Level 6").count()
-
-  bba_count = Student.objects.filter(course__course="BBA Hons").count()
-  bba_l4 = Student.objects.filter(course__course="BBA Hons", level__level="Level 4").count()
-  bba_l5 = Student.objects.filter(course__course="BBA Hons", level__level="Level 5").count()
-  bba_l6 = Student.objects.filter(course__course="BBA Hons", level__level="Level 6").count()
-
-  bsc_subjects = Subject.objects.filter(course__course = 'BSC Hons').order_by('level__level')
-  levels = Level.objects.values_list('level' , flat=True).order_by('level')
-  context = {
-             'bbs_data':{
-               'count': bsc_count,
-               'bsc_l4':bsc_l4,
-               'bsc_l5':bsc_l5,
-               'bsc_l6':bsc_l6
-               },
-             'bba_data':{
-               'count': bba_count,
-               'bba_l4':bba_l4,
-               'bba_l5':bba_l5,
-               'bba_l6':bba_l6
-             },
-             'bsc_subjects':bsc_subjects,
-             'levels':levels
-             }
-  if request.method == 'POST':
+  def post(self, request):
     course = ""
     
     data = request.POST
@@ -220,13 +185,16 @@ def course_details(request):
     messages.success(request , f"Successfully added {subject_name} subject")
     return redirect("/staff/course/")
       
-  return render(request , 'course.html' , context)
+    return render(request , 'course.html' , context)
+  
+  
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class DeleteNotice(View):
+  def get(self, request, *args , **kwargs):
+    notice = Notice.objects.get(id = self.kwargs.get('id'))
+    notice.delete()
+    return redirect('/staff/staff_dashboard/')
 
-@login_required(login_url='/')
-def delete_notice(request , id):
-  notice = Notice.objects.filter(id = id)
-  notice.delete()
-  return redirect('/staff/staff_dashboard/')
 
 @login_required(login_url='/') 
 def assignment(request):
@@ -525,4 +493,89 @@ def view_submission(request, slug):
     context = {'submitted_assignment': page_obj}
 
     return render(request, 'view_submission.html', context)
+
+# @login_required(login_url='/')
+class ViewStudent(View):
+  def get(self , request):
+    
+    students = Student.objects.all().order_by('level' , 'student_id')
+    
+    data = request.GET
+    level = data.get('level')
+    action = data.get('action')
+    search = data.get('search')
+    course = ""  
+    if action == "bsc": 
+        course = "BSC"
+        students = Student.objects.filter(course__course__icontains = 'BSC Hons' , level__level__contains = level).order_by('level')
+    elif action == "bba":
+        course = "BBA" 
+        students = Student.objects.filter(course__course__icontains = 'BBA Hons' , level__level__contains = level).order_by('level') 
+    
+    if search:
+      searched = search.split()
+      for word in searched:
+        students = students.filter(Q(name__icontains = word)|
+                                   Q(level__level__contains = word))    
+    
+    
+    context = {'students':students , "level" :level , 'course':course}
+    return render(request , "view_std.html" , context)
+  
+  def post(self, request):
+    
+    assignment = None 
+    
+    data = request.POST
+    to_email = data.get('to')
+    subject = data.get('subject') 
+    message = data.get('message')   
+    
+    attachment = request.FILES.get('attachment')
+    
+    send_email([to_email] , subject , message , attachment)
+    messages.success(request , "Successfully Sent Email !!")
+    return redirect('view_student')
+    return render(request , 'view_std')
+  
+class View_Student_Attendance(View):
+    def get(self, request, slug):
+        student = Student.objects.get(slug = slug)
+        context = {'student':student}
+        attendance_records = Attendance.objects.filter(student = student).order_by('-date')
+        
+        paginator = Paginator(attendance_records, 3)
+        page_number = request.GET.get("page" , 1)
+        page_obj = paginator.get_page(page_number)
+        
+        
+        search = request.GET.get('search')
+        if search:
+          page_obj = attendance_records.filter(date__icontains= search)
+          
+        attendance_count = attendance_records.count()
+        present_attendance_count = 0
+      
+        for attendance in attendance_records:
+            if attendance.attendance == "Present":
+                present_attendance_count += 1
+        
+        if attendance_count != 0:
+            present_attendance_percentage = (present_attendance_count / attendance_count) * 100
+            context.update({"present_attendance_percentage":present_attendance_percentage})
+        else:
+            context.update({'attendance_status':"Attendance Not Taken"})
+            
+        current_date = date.today()
+        
+            
+        context.update({'attendance_records':page_obj , 'uid':slug})
+
+        return render(request, 'view_std_attendance.html', context)
+
+    def post(self, request, slug):
+        return render(request, 'view_std_attendance.html')
+
+  
+    
 

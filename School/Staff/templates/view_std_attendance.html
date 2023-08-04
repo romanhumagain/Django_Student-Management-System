@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block link %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet"/>
+{% endblock %}
+{% block search %}
+<form class="d-flex" role="search"  style="margin-left: 180px;">
+  <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+  <button class="btn btn-outline-dark" type="submit">Search</button>
+</form>
+{% endblock %}
+{% block body %}
+  {% if attendance_records %}
+  
+    <h5 class="mt-1" style =" text-align: right; padding-right: 200px;"> <i class="fas fa-user-circle"></i> {{student.name}}</h5>
+  <div class="container mt-3">
+    <div class="card">
+      <div class="card-header">
+        <h4> <i class="fas fa-calendar-check mr-2"></i>Attendance Tracker</h4>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in attendance_records %}
+            <tr>
+              <td>{{ record.date }}</td>
+              <td>
+                
+                {% if record.attendance == 'Present' %}
+                <span class="badge badge-success">{{ record.attendance }}</span>
+                {% elif record.attendance == 'Absent' %}
+                <span class="badge badge-danger">{{ record.attendance }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          {% if attendance_records.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+              <span aria-hidden="true">&laquo;&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ attendance_records.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          {% endif %}
+          {% for i in attendance_records.paginator.page_range %}
+          <li class="page-item {% if attendance_records.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+          </li>
+          {% endfor %}
+          {% if attendance_records.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ attendance_records.next_page_number }}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ attendance_records.paginator.num_pages }}" aria-label="Last">
+              <span aria-hidden="true">&raquo;&raquo;</span>
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+
+    {% if present_attendance_percentage < 50 %} <button type="button" class="btn btn-danger m-3">
+      Attendance
+      <span class="badge text-bg-secondary m-1">{{present_attendance_percentage|floatformat:0}}%</span>
+      </button>
+      {% endif%} {% if present_attendance_percentage >= 50 %}
+      <button type="button" class="btn btn-primary m-3">
+        Attendance
+        <span class="badge text-bg-secondary m-1">{{present_attendance_percentage|floatformat:0}} %</span>
+      </button>
+      {% endif%}
+  </div>
+  {% endif %}
+
+  {% if not attendance_records %}
+  <div class="container mt-3">
+    <div class="alert alert-danger">Attendance not taken yet !!</div>
+  </div>
+  {% endif %}
+
+{% endblock %}

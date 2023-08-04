@@ -39,9 +39,11 @@ input[type="text"] {
   margin-bottom: 15px;
   font-size: 16px;
 }
-footer {
-  color: #766f6f;
+footer{
+  margin-top: 20px;
+  color:#635d5d;
   padding: 10px;
   text-align: center;
   font-style: italic;
+  background-color: white; 
 }

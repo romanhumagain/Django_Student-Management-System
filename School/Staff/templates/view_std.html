@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Student</title>
+  <link rel="stylesheet" href="{% static 'staff_css/view_std.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <div class="logo">
+        <span class="logo-text">My<span class="logo-highlight">School</span></span>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/staff/staff_dashboard"
+              style="margin-left: 50px;">Dashboard</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Students
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'student_registration' %}">Register Students</a></li>
+              <li><a class="dropdown-item" href="{% url 'view_student' %}">View Students</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="{% url 'course' %}">Course</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link " href="{% url 'assignment' %}">Assignment</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Grades
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'grades' %}">Add Grades</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/staff/attendance/">Attendence</a>
+          </li>
+
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-dark" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'success' %}
+
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  {{message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+<div class="container">
+  {% if level and course %}
+  <p class="m-2" style="font-size: 18px; color: #d52d2d; font-family: Arial, sans-serif;">
+    </i>Showing result of <strong>{{ level }}</strong>, <strong>{{ course }}</strong>
+  </p>
+  {% else %}
+  <p class="m-2" style="font-size: 18px; color: #d52d2d; font-family: Arial, sans-serif;">
+    Showing result of <strong>All</strong> Students</strong>
+  </p>
+  {% endif %}
+</div>
+
+  <div class="container center" style="display: flex; align-items: center; justify-content: center;">
+    <form class="card p-4 shadow-lg m-2" style="max-width: 420px;">
+      <div class="d-flex justify-content-center mb-1">
+        <label for="level" class="form-label " style="margin-top: 17px;"><i class="fas fa-layer-group "></i></label>
+        <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
+          <option selected disabled>Select Level</option>
+          <option value="Level 4">Level 4</option>
+          <option value="Level 5">Level 5</option>
+          <option value="Level 6">Level 6</option>
+        </select>
+        <button type="submit" name="action" value="bsc" class="btn btn-outline-primary me-2">
+          BSC
+        </button>
+        <button type="submit" name="action" value="bba" class="btn btn-outline-success">
+          BBA
+        </button>
+      </div>
+      <hr>
+
+    </form>
+  </div>
+  <div class="container" style="font-size: small; max-width: 1400px; align-items: center; justify-content: center;">
+    <table class="table table-striped table-hover shadow-lg m-4">
+      <thead>
+        <tr>
+          <th scope="col" class="small"></th>
+          <th scope="col" class="small">Std_ID</th>
+          <th scope="col" class="small">Name</th>
+          <th scope="col" class="small">Email</th>
+          <th scope="col" class="small">Address</th>
+          <th scope="col" class="small">D.O.B</th>
+          <th scope="col" class="small">Phone No</th>
+          <th scope="col" class="small">Level</th>
+          <th scope="col" class="small">Mail/View Info</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for data in students %}
+        <tr>
+          <td>
+            {% if data.profile_pic %}
+            <img src="/media/{{data.profile_pic}}" alt="Profile Picture" class="rounded-circle shadow-lg profile-img"
+              style="width: 45px; height: 45px;">
+            {% else %}
+            <img src="{% static 'images/blankpp.jpg' %}" alt="Profile Picture" class="rounded-circle profile-img"
+              style="width: 45px; height:45px;">
+            {% endif %}
+
+          </td>
+          <td><strong>{{data.student_id}}</strong></td>
+          <td>{{data.name}}</td>
+          <td>{{data.user.username}}</td>
+          <td>{{data.address}}</td>
+          <td>{{data.dob}}</td>
+          <td>{{data.phone_no}}</td>
+          <td>{{data.level}}</td>
+          <td>
+            <a href="" class="btn  send-email-btn btn-sm" data-bs-toggle="modal" data-bs-target="#mailModal"
+              data-email="{{ data.user.username }}">
+              <i class="fas fa-envelope fa-xs" style="font-size:24px; color: rgb(227, 32, 32);"></i>
+            </a>
+            <a href="" class="btn  view_info_btn btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal"
+              data-slug="{{ data.slug }}">
+              <i class="fas fa-list" style="font-size:24px;"></i> <!-- FontAwesome mail icon -->
+            </a>
+
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!--  all code below this is for modal -->
+
+  <!-- for mail modal -->
+  <div class="modal fade" id="mailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="mailModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="mailModal">Compose Email</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group m-2">
+                <label for="to">To:</label>
+                <input type="email" class="form-control" id="to" name="to" required />
+              </div>
+              <div class="form-group m-2">
+                <label for="inputSubject">Subject:</label>
+                <input type="text" class="form-control" id="inputSubject" name="subject" required />
+              </div>
+              <div class="form-group m-2">
+                <label for="inputMessage">Message:</label>
+                <textarea class="form-control" id="inputMessage" name="message" rows="10" style="height: 100px"
+                  required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="inputAttachments">Attachments:</label>
+                <input type="file" class="form-control-file" id="inputAttachments" name="attachment" multiple />
+              </div>
+              <hr />
+              <div class="form-group">
+                <button type="submit" name="action" value="send_email" class="btn btn-primary">
+                  Send
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                  Discard
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- for viewing info modal  -->
+  <div class="modal fade" id="infoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="infoModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: rgb(212, 214, 215);">
+          <h1 class="modal-title fs-5" id="mailModal" >View Acedamic Information</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <a href="#" id="attendance-link" class="btn badge custom-badge bg-danger text-light" role="button"
+            style="padding: 5px 10px; font-size: 12px;"><i class="fas fa-check-circle me-2"></i>View Attendance Details</a>
+
+          <a href="#" id="certificate-link" class="btn badge custom-badge bg-primary text-light" role="button"
+            style="padding: 5px 10px; font-size: 12px;"><i class="fas fa-certificate me-2"></i>View Certificate</a>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <footer style="margin-top: 20px;">
+    <p>&copy; 2023 Designed and Built by Roman Humagain</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+    crossorigin="anonymous"></script>
+
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.send-email-btn').on('click', function () {
+        var studentEmail = $(this).data('email'); // get student email
+        $('#to').val(studentEmail); // set the email to the 'To' input field
+      });
+    });
+  </script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.view_info_btn').on('click', function () {
+        var studentSlug = $(this).data('slug'); // get student slug
+        $('#slug').val(studentSlug); // set the email to the 'To' input field
+        var attendanceUrl = "/staff/student_attendance_record/" + studentSlug + "/"; // replace "/some_base_url/" with your base url for attendance details
+        var certificateUrl = "/staff/view_marksheet/" + studentSlug + "/";
+        $('#attendance-link').attr('href', attendanceUrl);
+        $('#certificate-link').attr('href', certificateUrl);
+      });
+    });
+  </script>
+
+</body>
+
+</html>

@@ -38,13 +38,6 @@ body {
   margin-left: 4px;
 }
 
-footer {
-  color: #766f6f;
-  padding: 10px;
-  text-align: center;
-  font-style: italic;
-  background: #f06292;
-}
 
 .card {
   border-radius: 15px;
@@ -80,4 +73,12 @@ footer {
 
 .container {
   padding: 30px;
+}
+footer{
+  margin-top: 20px;
+  color:#635d5d;
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  background-color: white; 
 }

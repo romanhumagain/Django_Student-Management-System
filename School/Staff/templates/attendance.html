@@ -22,6 +22,11 @@
 }
 </style>
 {% endblock %}
+{% block search %}
+<div class="date-time p-1 " style="margin-left: 340px; margin-top: 10px;">
+  <i class="fas fa-clock"></i> {{ current_date_and_time}}
+</div>
+{% endblock%}
 {% block body %}
 {% if messages %}
 {% for message in messages %}
@@ -34,14 +39,12 @@
 {% endfor %}
 {% endif %}
 <div class="container">
-  <form method="POST">
+  <div class="container">
+    <h2 class="p-2 title"><i class="fas fa-calendar-check"></i> Attendance Dashboard</h2>
+  </div>
+  <form method="POST" style="margin-bottom: 50px;">
     {% csrf_token %}
-    <div class="container">
-      <h2 class="p-3 title"><i class="fas fa-calendar-check"></i> Attendance Dashboard</h2>
-    </div>
-    <div class="date-time p-1 " style="background-color: #000000; color: white; margin-left: 1090px;">
-      <i class="fas fa-clock"></i> {{ current_date_and_time}}
-    </div>
+    
     <div class="card m-2 shadow-lg" style="width: 400px;">
       <div class="card-body">
         <h5 class="card-title"><i class="fas fa-book"></i> Select Course</h5>

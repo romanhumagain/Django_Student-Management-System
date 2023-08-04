@@ -49,6 +49,7 @@ class Profile(models.Model):
   
 class Notice(models.Model):
   notice = models.TextField(max_length=500)
+  posted_date = models.DateField(null=True , default=None)
   
   def __str__(self) -> str:
     return self.notice
