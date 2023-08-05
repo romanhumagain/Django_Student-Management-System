@@ -54,7 +54,6 @@
                       </a>
                       <ul class="dropdown-menu">
                           <li><a class="dropdown-item" href="{% url 'grades' %}">Add Grades</a></li>
-                          <li><a class="dropdown-item" href="{% url 'view_grades' %}">View Grades</a></li>
                       </ul>
                   </li>
 
@@ -75,68 +74,71 @@
     <form method="POST" action="{% url 'grades' %}" class="card p-4 shadow-lg m-2 bg-light" style="max-width: 520px;">
       {% csrf_token %}
       <div class="mb-3">
-        <label for="exam" class="form-label"><i class="fas fa-file-alt me-2"></i>Select Exam:</label>
-        <select id="exam" name="exam" class="form-select" required>
-          {% if not selected_exam %}
-          <option value="" disabled selected hidden>Exam Type</option>
-          {% endif %}
-          {% if selected_exam %}
-          <option value="{{selected_exam}}" selected>{{selected_exam}}</option>
-          {% endif %}
-          {% for exam_option in exams %}
-            <option value="{{ exam_option.exam }}">{{ exam_option.exam }}</option>
-          {% endfor %}
-        </select>
+          <label for="exam" class="form-label"><i class="fas fa-file-alt me-2"></i>Select Exam:</label>
+          <select id="exam" name="exam" class="form-select" required>
+              {% if not selected_exam %}
+              <option value="" disabled selected hidden>Exam Type</option>
+              {% endif %}
+              {% if selected_exam %}
+              <option value="{{selected_exam}}" selected>{{selected_exam}}</option>
+              {% endif %}
+              {% for exam_option in exams %}
+              <option value="{{ exam_option.exam }}">{{ exam_option.exam }}</option>
+              {% endfor %}
+          </select>
       </div>
   
       <div class="mb-3 d-flex justify-content-center">
-        <label for="level" class="form-label " style="margin-top: 17px;"><i class="fas fa-layer-group "></i></label>
-        <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
-          {% if not level %}
-          <option selected>Select Level</option>
-          {% endif %}
-          {% if level %}
-          <option selected>{{level}}</option>
-          {% endif %}
-          <option value="Level 4">Level 4</option>
-          <option value="Level 5">Level 5</option>
-          <option value="Level 6">Level 6</option>
-        </select>
-        <button type="submit" name="action" value="BSC Hons" class="btn btn-outline-primary me-2">
-          BSC
-        </button>
-        <button type="submit" name="action" value="BBA Hons" class="btn btn-outline-success">
-          BBA
-        </button>
+          <label for="level" class="form-label " style="margin-top: 17px;"><i class="fas fa-layer-group "></i></label>
+          <select class="form-select m-2" aria-label="Default select example" name="level" id="level" required>
+              {% if not level %}
+              <option selected>Select Level</option>
+              {% endif %}
+              {% if level %}
+              <option selected>{{level}}</option>
+              {% endif %}
+              <option value="Level 4">Level 4</option>
+              <option value="Level 5">Level 5</option>
+              <option value="Level 6">Level 6</option>
+          </select>
+          <button type="submit" name="action" value="BSC Hons" class="btn btn-outline-primary me-2">
+              BSC
+          </button>
+          <button type="submit" name="action" value="BBA Hons" class="btn btn-outline-success">
+              BBA
+          </button>
       </div>
   
       <hr>
   
       <div class="mb-3">
-        <label for="student" class="form-label"><i class="fas fa-user me-2"></i>Select Student:</label>
-        <select id="student" name="student" class="form-select">
-          <option value="" disabled selected hidden>Select Student</option>
-          {% for student in students %}
-            <option value="{{ student.id }}">{{ student.name }}</option>
-          {% endfor %}
-        </select>
+          <label for="student" class="form-label"><i class="fas fa-user me-2"></i>Select Student:</label>
+          <select id="student" name="student" class="form-select">
+              <option value="" disabled selected hidden>Select Student</option>
+              {% for student in students %}
+              <option value="{{ student.id }}">{{ student.name }}</option>
+              {% endfor %}
+          </select>
       </div>
   
       {% for subject in subjects %}
-    <div class="row mb-3 align-items-center">
-      <div class="col-7">
-        <label for="subject{{subject.sub_name}}" class="form-label"><i class="fas fa-book me-2"></i>{{ subject.sub_name }}:</label>
+      <div class="row mb-3 align-items-center">
+          <div class="col-7">
+              <label for="subject{{subject.sub_name}}" class="form-label"><i class="fas fa-book me-2"></i>{{ subject.sub_name }}:</label>
+          </div>
+          <div class="col-5">
+              <input type="text" id="subject{{subject.sub_name}}" name="subject{{subject.sub_name}}" class="form-control" placeholder="Enter Marks" required>
+          </div>
       </div>
-      <div class="col-5">
-        <input type="text" id="subject{{subject.sub_name}}" name="subject{{subject.sub_name}}" class="form-control" placeholder="Enter Marks" required>
-      </div>
-    </div>
-    {% endfor %}  
-    
-    <button type="submit" name="action" value="submit" class="btn btn-success w-100" style="padding: 10px;">
-      <i class="fas fa-plus-circle me-2"></i>Add Grades
-    </button>
-    </form>
+      {% endfor %}  
+      
+      <input type="hidden" name="course" value="{{ course }}">  <!-- Added this line -->
+      
+      <button type="submit" name="action" value="submit" class="btn btn-success w-100" style="padding: 10px;">
+          <i class="fas fa-plus-circle me-2"></i>Add Grades
+      </button>
+  </form>
+  
   </div>
   
 <footer style="margin-top: 20px;">

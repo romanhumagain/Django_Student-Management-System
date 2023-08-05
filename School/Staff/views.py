@@ -20,6 +20,15 @@ from django.views import View
 @method_decorator(login_required(login_url='/') , name='dispatch')
 class StaffDashboard(View):
   
+  def get_all_user_email(self):
+    to_email = []
+    users = User.objects.all()
+    for user in users:
+      email = user.username
+      to_email.append(email)
+    
+    return to_email
+    
   def get(self, request):
     data = request.GET
     action = data.get('action')
@@ -56,10 +65,16 @@ class StaffDashboard(View):
     action = data.get('action')
     
     if action == "post_notice":
-      notice = data.get('notice')
+      notice_details = data.get('notice')
       posted_date = date.today()
-      print(posted_date)
-      notice = Notice.objects.create(notice = notice, posted_date=posted_date)
+      notice = Notice.objects.create(notice = notice_details, posted_date=posted_date)
+      
+      to_email = self.get_all_user_email()
+      
+      subject = "Regarding Notice"
+      message = notice_details
+      attachment = None
+      send_email(to_email, subject, message, attachment)
       return redirect('/staff/staff_dashboard/')
       
     return render(request, 'dashboard.html',{})
@@ -96,7 +111,7 @@ class StudentRegistration(View):
     level = data.get('level')
       
     user = User.objects.create(username = email)
-    user.set_password("romanroman")
+    user.set_password(password)
     user.save()
       
     userType = UserType.objects.create(user = user)
@@ -316,74 +331,83 @@ def attendance(request):
           
     return render(request, 'attendance.html', context)
   
-@login_required(login_url='/')
-def grades(request):
-    exams = Examination.objects.all().order_by('-id')
-    context = {'exams': exams}
+class GradesView(View):
+    template_name = 'grades.html'
+     
+    def get(self, request):
+        exams = Examination.objects.all().order_by('-id')
+        context = {'exams': exams}
+        return render(request, self.template_name, context)
     
-    global selected_exam
-    global level
-    global course 
-    if request.method == 'POST':
+    def post(self, request):
         data = request.POST
         selected_exam = data.get('exam')
         level = data.get('level')
         Std_name = data.get('student')
         action = data.get('action')
+        course = data.get('course') if action == 'submit' else self.determine_course(action)
         
-        context.update({"level":level , 'selected_exam':selected_exam})
-
-        if action == "BSC Hons":
-            course = "BSC Hons"
-        elif action == "BBA Hons":
-            course = "BBA Hons"
+        context = {"level":level , 'selected_exam':selected_exam, 'course': course}  # add 'course' to context
         
         level_obj = Level.objects.get(level = level)
-        print(f"Course: {course}")  # Debug line
-        course_obj = Course.objects.get(course = course)
+        course_obj = get_object_or_404(Course, course = course)
         
+        students_not_in_marks, subjects = self.get_student_and_subject(level_obj, course_obj, selected_exam)
+        
+        context.update({'students': students_not_in_marks, 'subjects': subjects})
+        
+        if action == "submit":
+            self.submit_marks(request, level_obj, course, Std_name, selected_exam, students_not_in_marks)
+        
+        return render(request, self.template_name, context)
+    
+    def determine_course(self, action):
+        if action == "BSC Hons":
+            return "BSC Hons"
+        elif action == "BBA Hons":
+            return "BBA Hons"
+        else:
+            return None
+    
+    def get_student_and_subject(self, level_obj, course_obj, selected_exam):
         students = Student.objects.filter(level=level_obj, course=course_obj)
         subjects = Subject.objects.filter(level=level_obj, course=course_obj)
+        students_not_in_marks = students.exclude(subjectmarks__exam__exam__contains = selected_exam)
         
-        students_not_in_marks = students.exclude(subjectmarks__exam__exam__contains=selected_exam)
-             
-        context.update({'students': students_not_in_marks, 'subjects': subjects})
-            
-        if action == 'submit':
-            exam = Examination.objects.get(exam = selected_exam)
-            student = Student.objects.get(id = Std_name)
-            subjects = Subject.objects.filter(level=level_obj, course=course_obj)
-            marks_list = []
-            if course_obj is not None:
-              for subject in subjects:
-                  marks = int(request.POST.get(f"subject{subject.sub_name}"))
-                  subjectMarks = SubjectMarks.objects.create(student = student , subject = subject , exam = exam , marks = marks)
-                  marks_list.append(marks)
-            else:
-                print(f"No Course found with the name: {course}")
-                # Handle this case in some way, perhaps by returning an error message in the context
+        return students_not_in_marks, subjects
+      
+    def submit_marks(self, request, level_obj, course, Std_name, selected_exam, students_not_in_marks):
+        course_obj = get_object_or_404(Course, course=course)
+        print("printing the course obj in the submit_marks func ", course_obj)
+        exam = Examination.objects.get(exam=selected_exam)
+        student = Student.objects.get(id=Std_name)
+        subjects = Subject.objects.filter(level=level_obj, course=course_obj)
+        marks_list = []
+        
+        if course_obj is not None:
+            for subject in subjects:
+                marks = int(request.POST.get(f"subject{subject.sub_name}"))
+                SubjectMarks.objects.create(student=student, subject=subject, exam=exam, marks=marks)
+                marks_list.append(marks)
+        else:
+            print(f"No Course found with the name: {course}")
 
-            total_marks = sum(marks_list)
-            totalMarkObj = TotalMark.objects.create(student = student , total_mark = total_marks , exam = exam , level=level_obj, course=course_obj)
+        total_marks = sum(marks_list)
+        totalMarkObj = TotalMark.objects.create(student=student, total_mark=total_marks, exam=exam, level=level_obj, course=course_obj)
 
-            if not students_not_in_marks:
-              totalMarkObj = TotalMark.objects.filter(exam = exam , level=level_obj, course=course_obj).order_by('-total_mark')
-              
-              previous_total_mark = None
-              previous_rank = 0
-              
-              for total_mark in totalMarkObj:
+        if not students_not_in_marks:
+            totalMarkObj = TotalMark.objects.filter(exam=exam, level=level_obj, course=course_obj).order_by('-total_mark')
+            previous_total_mark = None
+            previous_rank = 0
+            for total_mark in totalMarkObj:
                 if total_mark.total_mark != previous_total_mark:
-                  rank = previous_rank+1
-                  previous_rank = rank
-                  
-                  total_mark.rank = rank
-                  total_mark.save()
-                  
-                  previous_total_mark = total_mark.total_mark
-                  
-    return render(request, 'grades.html', context)
+                    rank = previous_rank + 1
+                    previous_rank = rank
+                    total_mark.rank = rank
+                    total_mark.save()
+                    previous_total_mark = total_mark.total_mark
 
+                  
 @login_required(login_url='/')
 def view_grades(request):
     exams = Examination.objects.all().order_by('-id')
@@ -426,33 +450,29 @@ def view_grades(request):
     context.update({'search_query': search_query})
     return render(request, 'view grades.html', context)
 
-@login_required(login_url='/')
-def view_marksheet(request, slug):
+
+@method_decorator(login_required(login_url='/') , name="dispatch")
+class ViewMarksheet(View):
+  def get(self, request , *args , **kwargs ):
     exams = Examination.objects.all().order_by('-id')
-    student = Student.objects.get(slug=slug)  # Get the selected student
+    student = Student.objects.get(slug=kwargs.get('slug'))  # Get the selected student
     course = student.course
     level = student.level
     
-    if request.method == 'POST':
-        data = request.POST
-        search = data.get('search')
+    search = request.GET.get('search')
         
-        if search:
-          exams = exams.filter(Q(exam__icontains = search)|
-                               Q(date__icontains = search))
+    if search:
+      exams = exams.filter(Q(exam__icontains = search)|
+                           Q(date__icontains = search))
       
-    
     context = {'exams': exams, 'student': student}
     
     totalMarkObject = TotalMark.objects.filter(student = student)
-    
     results = []
-    
     for exam in exams:
       subjectMarks = SubjectMarks.objects.filter(student = student , exam = exam)
       sub_count = Subject.objects.filter(course__course = course , level__level = level).count()
-      total_full_marks = sub_count * 100
-      
+      total_full_marks = sub_count * 100 
       try:
         totalMarks = TotalMark.objects.get(student =student , exam = exam)
         total_marks = totalMarks.total_mark
@@ -477,7 +497,8 @@ def view_marksheet(request, slug):
         'first_name': first_name,
                  })
     return render(request, 'marksheet.html', context)
-  
+    
+    
 def view_submission(request, slug):
     assignment = Assignment.objects.get(slug=slug)
     submitted_assignment = SubmittedAssignment.objects.filter(assignment=assignment)
@@ -512,14 +533,18 @@ class ViewStudent(View):
         course = "BBA" 
         students = Student.objects.filter(course__course__icontains = 'BBA Hons' , level__level__contains = level).order_by('level') 
     
+    paginator = Paginator(students , 4)
+    page_number = request.GET.get('page' , 1)
+    page_obj = paginator.get_page(page_number)
+    
     if search:
       searched = search.split()
       for word in searched:
-        students = students.filter(Q(name__icontains = word)|
+        page_obj = students.filter(Q(name__icontains = word)|
                                    Q(level__level__contains = word))    
     
     
-    context = {'students':students , "level" :level , 'course':course}
+    context = {'students':page_obj , "level" :level , 'course':course}
     return render(request , "view_std.html" , context)
   
   def post(self, request):
@@ -577,5 +602,4 @@ class View_Student_Attendance(View):
         return render(request, 'view_std_attendance.html')
 
   
-    
-
+  

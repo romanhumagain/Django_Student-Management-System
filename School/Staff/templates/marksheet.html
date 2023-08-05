@@ -81,10 +81,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/staff/attendance/">Attendence</a>
                     </li>
-                    <form class="d-flex" role="search" style="margin-left: 220px;" method="POST">
-                        {% csrf_token %}
+                    <form class="d-flex" role="search" style="margin-left: 220px;">
                         <input class="form-control me-2" type="search" name="search" placeholder="Search"
-                            aria-label="Search" {% if search_query %} value="{{ search_query }}" {% endif %}>
+                            aria-label="Search">
                         <button class="btn btn-outline-dark" type="submit">Search</button>
                     </form>
                 </ul>
