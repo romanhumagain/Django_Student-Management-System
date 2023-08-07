@@ -15,6 +15,7 @@ import uuid
 from django.db.models import Sum , Q
 from django.core.paginator import Paginator 
 from django.views import View
+from datetime import datetime
 
 
 @method_decorator(login_required(login_url='/') , name='dispatch')
@@ -82,8 +83,8 @@ class StaffDashboard(View):
 @method_decorator(login_required(login_url='/') , name='dispatch')
 class StudentRegistration(View):
   def get(self , request):
-    
     return render(request , 'registration.html')
+  
   def post(self , request):
     upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     lower_case = " abcdefghijklmnopqrstuvwxyz"
@@ -210,108 +211,98 @@ class DeleteNotice(View):
     notice.delete()
     return redirect('/staff/staff_dashboard/')
 
-
-@login_required(login_url='/') 
-def assignment(request):
-  
-  if request.method == 'POST':
-    data = request.POST
-    
-    course = data.get('course')
-    level = data.get('level')
-    assignment = data.get('assignment')
-    due_date = data.get('date')
-    due_time = data.get('time')
-    
-    course = Course.objects.get(course = course)
-    level = Level.objects.get(level = level)
-    current_date = date.today()
-    assignment = Assignment.objects.create(course = course , level = level , assignment = assignment , posted_date=current_date, due_date =due_date , due_time = due_time)
-    
-    email_address = []
-    students = Student.objects.filter(course = course , level = level)
-    
-    for student in students:
-      email = student.user.username
-      email_address.append(email)
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class AssignmentView(View):
+    def get(self, request):
+        assignment = Assignment.objects.all().order_by('level')
+        context = {'assignments': assignment}
+        return render(request, 'assignment.html', context)
       
-    from datetime import datetime  # Note the corrected import statement
-    # parse the strings to datetime objects
-    due_date = datetime.strptime(due_date, '%Y-%m-%d')
+    def post(self, request):
+        data = request.POST
 
-    # parse the string to a datetime object
-    due_time = datetime.strptime(due_time, '%H:%M')
+        course = Course.objects.get(course=data.get('course'))
+        level = Level.objects.get(level=data.get('level'))
+        assignment_text = data.get('assignment')
+        due_date = data.get('date')
+        due_time = data.get('time')
+        current_date = date.today()
+        assignment = Assignment.objects.create(course=course, level=level, assignment=assignment_text, posted_date=current_date, due_date=due_date, due_time=due_time)
+        
+        email_address = []
+        students = Student.objects.filter(course=course, level=level)
 
-    # now you can format the datetime objects
-    formatted_due_date = due_date.strftime('%B %d, %Y')  # e.g., 'August 01, 2023'
-    formatted_due_time = due_time.strftime('%I:%M %p')  # e.g., '11:59 PM'
+        for student in students:
+            email = student.user.username
+            email_address.append(email)
 
-    message = f"You have been assigned an assignment which has a deadline of <strong>{formatted_due_date} at {formatted_due_time}</strong>. Please ensure to complete and submit it by the given due date.<br>Kind Regards, <br>MySchool"
-    subject = "Regarding Assignment"
-    
-    
-    send_email(email_address , subject , message , attachment=None )
-    messages.success(request , 'successfully posted assignment')
+        from datetime import datetime
+        due_date = datetime.strptime(due_date, '%Y-%m-%d')
+
+        due_time = datetime.strptime(due_time, '%H:%M')
+
+        formatted_due_date = due_date.strftime('%B %d, %Y')  # e.g., 'August 01, 2023'
+        formatted_due_time = due_time.strftime('%I:%M %p')  # e.g., '11:59 PM'
+
+        message = f"You have been assigned an assignment which has a deadline of <strong>{formatted_due_date} at {formatted_due_time}</strong>. Please ensure to complete and submit it by the given due date.<br>Kind Regards, <br>MySchool"
+        subject = "Regarding Assignment"
+
+        send_email(email_address, subject, message, attachment=None)
+        messages.success(request, 'successfully posted assignment')
+
+        return redirect('/staff/assignment/')
+
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class DeleteAssignment(View):
+  def get(self, request, *args , **kwargs):
+    assignment = Assignment.objects.filter(id = kwargs.get('id'))
+    assignment.delete()
     return redirect('/staff/assignment/')
-  
-  assignment = Assignment.objects.all().order_by('level')
-  context = {'assignments':assignment}
-  return render( request, 'assignment.html', context)
 
-@login_required(login_url='/')
-def delete_assignment(request , id):
-  assignment = Assignment.objects.filter(id = id)
-  assignment.delete()
-  return redirect('/staff/assignment/')
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class AttendanceView(View):
+    def get(self, request):
+        current_date_and_time = datetime.now()
+        formatted_date_and_time = current_date_and_time.strftime("%Y-%m-%d %H:%M")
+        context = {'current_date_and_time': formatted_date_and_time}
+        return render(request, 'attendance.html', context)
 
-@login_required(login_url='/')
-def attendance(request):
-    current_date_and_time = datetime.datetime.now()
-    formatted_date_and_time = current_date_and_time.strftime("%Y-%m-%d %H:%M")
+    def post(self, request):
+        current_date = date.today()
+        global course 
+        global level 
+        context = {}
+        data = request.POST
+        action = data.get('action')
 
-    current_date_and_time = datetime.datetime.now()
-    context = {'current_date_and_time':formatted_date_and_time}
-    
-    current_date = date.today()
-    global course 
-    global level 
-    
-    if request.method == 'POST':
-      data = request.POST
-      action = data.get('action')
-      
-      if action == 'sort':
-            current_date = date.today()
+        if action == 'sort':
             course = data.get('course')
             level = data.get('level')
-            
-            
             course_inst = Course.objects.get(course=course)
             level_inst = Level.objects.get(level=level)
-            
             students = Student.objects.filter(course=course_inst, level=level_inst)
-            
+
             for student in students:
-              attendance = Attendance.objects.filter(student = student , date = current_date)
-              if attendance:
-                messages.error(request , 'Attendance Already Taken !!')
-                return redirect('/staff/attendance/')
-              else:
-                break
+                attendance = Attendance.objects.filter(student=student, date=current_date)
+                if attendance:
+                    messages.error(request, 'Attendance Already Taken !!')
+                    return redirect('/staff/attendance/')
+                else:
+                    break
+
             if not students:
                 context['error_message'] = 'No students found'
+
             context.update({'students': students})
             
-      if action == 'attendance':
+        if action == 'attendance':
             course_inst = Course.objects.get(course=course)
             level_inst = Level.objects.get(level=level)
-            
             selected_attendance = request.POST.getlist('attendance[]')
-            presented_attendance=list(map(int, selected_attendance))
-            
+            presented_attendance = list(map(int, selected_attendance))
             all_students = Student.objects.filter(course=course_inst, level=level_inst)
             absent_student_email = []
-            
+
             for student in all_students:
                 std_id = student.student_id
                 user = student.user  
@@ -321,16 +312,19 @@ def attendance(request):
                 else:
                     absent_student_email.append(email)
                     attendance_status = 'Absent'
-                    
+
                 Attendance.objects.create(student=student, attendance=attendance_status, date=current_date)
+
             if absent_student_email:
-              absent_mail(absent_student_email)
+                absent_mail(absent_student_email)
               
-            messages.success(request,"Attendance successfully taken !!")
+            messages.success(request, "Attendance successfully taken !!")
             return redirect('/staff/attendance/')
-          
-    return render(request, 'attendance.html', context)
+
+        return render(request, 'attendance.html', context)
   
+  
+@method_decorator(login_required(login_url='/'),name="dispatch")
 class GradesView(View):
     template_name = 'grades.html'
      
@@ -407,49 +401,6 @@ class GradesView(View):
                     total_mark.save()
                     previous_total_mark = total_mark.total_mark
 
-                  
-@login_required(login_url='/')
-def view_grades(request):
-    exams = Examination.objects.all().order_by('-id')
-    context = {'exams': exams}
-
-    selected_exam = ""
-    level = ""
-    search_query = ""
-
-    students = Student.objects.all()
-    
-    if request.method == 'POST':
-        data = request.POST
-        selected_exam = data.get('exam')
-        level = data.get('level')
-        action = data.get('action')
-        search_query = data.get('search')
-        course = ""
-
-        context.update({'selected_exam': selected_exam ,"level":level})
-
-        if action == "bsc hons":
-            course = "BSC Hons"
-        elif action == "bba hons":
-            course = "BBA Hons"
-
-        students = Student.objects.all()
-
-        if level is not None:
-            students = students.filter(level__level__contains=level)
-
-        if course:
-            students = students.filter(course__course__contains=course)
-
-        if search_query:
-            students = students.filter(name__icontains=search_query)
-
-        context.update({'students': students})
-
-    context.update({'search_query': search_query})
-    return render(request, 'view grades.html', context)
-
 
 @method_decorator(login_required(login_url='/') , name="dispatch")
 class ViewMarksheet(View):
@@ -490,6 +441,7 @@ class ViewMarksheet(View):
         'percentage':percentage,
         'rank':rank
       })
+      
       first_name = student.name.split()[0]
       context .update({
         'results':results,
@@ -498,9 +450,10 @@ class ViewMarksheet(View):
                  })
     return render(request, 'marksheet.html', context)
     
-    
-def view_submission(request, slug):
-    assignment = Assignment.objects.get(slug=slug)
+@method_decorator(login_required(login_url='/'),name="dispatch")
+class ViewSubmission(View):
+  def get(self, request, *args , **kwargs):
+    assignment = Assignment.objects.get(slug=kwargs.get('slug'))
     submitted_assignment = SubmittedAssignment.objects.filter(assignment=assignment)
 
     paginator = Paginator(submitted_assignment , 5)
@@ -514,8 +467,9 @@ def view_submission(request, slug):
     context = {'submitted_assignment': page_obj}
 
     return render(request, 'view_submission.html', context)
+    
 
-# @login_required(login_url='/')
+@method_decorator(login_required(login_url='/'),name="dispatch")
 class ViewStudent(View):
   def get(self , request):
     
@@ -563,6 +517,7 @@ class ViewStudent(View):
     return redirect('view_student')
     return render(request , 'view_std')
   
+@method_decorator(login_required(login_url='/'),name="dispatch")
 class View_Student_Attendance(View):
     def get(self, request, slug):
         student = Student.objects.get(slug = slug)
@@ -600,6 +555,46 @@ class View_Student_Attendance(View):
 
     def post(self, request, slug):
         return render(request, 'view_std_attendance.html')
+      
+       
+@login_required(login_url='/')
+def view_grades(request):
+    exams = Examination.objects.all().order_by('-id')
+    context = {'exams': exams}
 
-  
-  
+    selected_exam = ""
+    level = ""
+    search_query = ""
+
+    students = Student.objects.all()
+    
+    if request.method == 'POST':
+        data = request.POST
+        selected_exam = data.get('exam')
+        level = data.get('level')
+        action = data.get('action')
+        search_query = data.get('search')
+        course = ""
+
+        context.update({'selected_exam': selected_exam ,"level":level})
+
+        if action == "bsc hons":
+            course = "BSC Hons"
+        elif action == "bba hons":
+            course = "BBA Hons"
+
+        students = Student.objects.all()
+
+        if level is not None:
+            students = students.filter(level__level__contains=level)
+
+        if course:
+            students = students.filter(course__course__contains=course)
+
+        if search_query:
+            students = students.filter(name__icontains=search_query)
+
+        context.update({'students': students})
+
+    context.update({'search_query': search_query})
+    return render(request, 'view grades.html', context)

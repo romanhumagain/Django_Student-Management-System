@@ -211,10 +211,11 @@ class ViewAssignment(View):
     def get_student_and_present_date(self, slug):
         student = get_object_or_404(Student, slug=slug)
         current_date = date.today()
-        return student, current_date
+        current_date_time = datetime.now()
+        return student, current_date, current_date_time
     
     def get(self, request, *args, **kwargs):
-        student, current_date = self.get_student_and_present_date(kwargs.get('slug'))
+        student, current_date, current_date_time = self.get_student_and_present_date(kwargs.get('slug'))
 
         notice_count = Notice.objects.count()
         absent_error = None
@@ -235,7 +236,14 @@ class ViewAssignment(View):
 
         assignments = Assignment.objects.filter(course=course_id, level=level_id).exclude(submittedassignment__student=student)
         ass_count = assignments.count()
-
+        assignment_status = {}
+        for assignment in assignments:
+          due_date = assignment.due_date
+          due_time = assignment.due_time
+          due_date_time = datetime.combine(due_date, due_time)
+          assignment.status = "Late Submission" if current_date_time >= due_date_time else "Submitted"
+       
+        
         assignment_submissions = SubmittedAssignment.objects.filter(student=student)
 
         context = {
@@ -247,16 +255,14 @@ class ViewAssignment(View):
             'submitted_assignments': assignment_submissions,
             'absent_error': absent_error,
             'pending_status': pending_status,
+            'assignment_status':assignment_status
         }
         
         return render(request, 'std_assignment.html', context)
       
     def post(self, request, *args , **kwargs):
-        student, current_date = self.get_student_and_present_date(kwargs.get('slug'))
-
+        student, current_date ,current_date_time = self.get_student_and_present_date(kwargs.get('slug'))
         current_time = datetime.now().time()
-        current_date_time = datetime.now()
-
         data = request.POST
         assignment_id = data.get('assignment')
         assignment_description = data.get('assignmentDesc')

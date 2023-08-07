@@ -4,13 +4,13 @@
 <form class="d-flex" role="search" style="margin-left: 200px;">
   <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
   <button class="btn btn-outline-dark" type="submit">Search</button>
-</form> 
+</form>
 {% endblock%}
 {% block body %}
 
 <div class="container mt-5">
   {% for submission in submitted_assignment %}
-<div class="card mb-4 shadow">
+  <div class="card mb-4 shadow">
     <div class="card-header  d-flex justify-content-center align-items-center bg-secondary text-white">
       <i class="fas fa-user-circle " style="margin-right:10px ;"></i>
       <h3>Submission by {{ submission.student.name }}</h3>
@@ -19,27 +19,31 @@
       <div class="row">
         <p class="mb-1" style="font-size: 0.9rem;">
           {% if submission.submission_status == "Late Submission" %}
-          <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i> {{submission.submission_status}}</span>
+          <span class="badge bg-danger"><i class="fas fa-exclamation-circle"></i>
+            {{submission.submission_status}}</span>
           {% endif %}
         </p>
         <div class="col-md-8">
           <p><strong><i class="fas fa-tasks"></i> Assignment:</strong> {{ submission.assignment.assignment }}</p>
-          <p><strong><i class="fas fa-calendar-alt"></i> Submitted Date and Time:</strong> {{ submission.submitted_date }} {{ submission.submitted_time }}</p>
+          <p><strong><i class="fas fa-calendar-alt"></i> Submitted Date and Time:</strong> 
+            {{ submission.submitted_date}} {{ submission.submitted_time }}</p>
           <p><strong><i class="fas fa-file-alt"></i> Description:</strong> {{ submission.assignment_description }}</p>
-          
-          <a href="{{ submission.submitted_assignment.url }}" class="btn btn-primary"><i class="fas fa-eye"></i> View Assignment</a>
-          <a href="{{ submission.submitted_assignment.url }}" download="" class="btn btn-outline-dark"><i class="fas fa-download"></i> Download Assignment</a>
+
+          <a href="{{ submission.submitted_assignment.url }}" class="btn btn-primary"><i class="fas fa-eye"></i> View
+            Assignment</a>
+          <a href="{{ submission.submitted_assignment.url }}" download="" class="btn btn-outline-dark"><i
+              class="fas fa-download"></i> Download Assignment</a>
         </div>
       </div>
     </div>
-</div>
-{% empty %}
-<div class="alert alert-warning" role="alert">
+  </div> 
+  {% empty %}
+  <div class="alert alert-warning" role="alert">
     <i class="fas fa-exclamation-triangle"></i> No submissions available for this assignment.
-</div>
-{% endfor %}
+  </div>
+  {% endfor %}
 
-  
+
   <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
       {% if submitted_assignment.has_previous %}
@@ -54,13 +58,13 @@
         </a>
       </li>
       {% endif %}
-  
+
       <li class="page-item disabled">
         <a class="page-link">
           Page {{ submitted_assignment.number }} of {{ submitted_assignment.paginator.num_pages }}
         </a>
       </li>
-      
+
       {% if submitted_assignment.has_next %}
       <li class="page-item">
         <a class="page-link" href="?page={{ submitted_assignment.next_page_number }}" aria-label="Next">

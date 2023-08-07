@@ -1,44 +1,43 @@
 {% extends 'base.html' %}
- {% load static %} 
- {% block title %}AssignmentDashboard{% endblock %}
+{% load static %}
+{% block title %}AssignmentDashboard{% endblock %}
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 <link rel="stylesheet" href="{% static 'css/assignment.css' %}" />
 {% block css %}
 <style>
   .card-header h2 {
-  color: #fff;
-}
+    color: #fff;
+  }
 
-.btn-warning {
-  color: #fff;
-  background-color: #0cb1af;
-  border-color: #0cb1af;
-}
+  .btn-warning {
+    color: #fff;
+    background-color: #0cb1af;
+    border-color: #0cb1af;
+  }
 
-.btn-warning:hover {
-  color: #fff;
-  background-color: #44a2a1;
-  border-color: #44a2a1;
-}
+  .btn-warning:hover {
+    color: #fff;
+    background-color: #44a2a1;
+    border-color: #44a2a1;
+  }
 
-.form-group label {
-  font-size: 16px;
-  font-weight: bold;
-}
+  .form-group label {
+    font-size: 16px;
+    font-weight: bold;
+  }
 
-.card-body {
-  padding: 20px;
-}
-
+  .card-body {
+    padding: 20px;
+  }
 </style>
 {% endblock %}
 {% block body %}
- {% if messages %}
-  {% for message in messages %}
-   {% if message.tags == 'success' %}
-    <div class="alert alert-success">{{message}}</div>
-  {% endif %}
- {% endfor %}
+{% if messages %}
+{% for message in messages %}
+{% if message.tags == 'success' %}
+<div class="alert alert-success">{{message}}</div>
+{% endif %}
+{% endfor %}
 {% endif %}
 <div class="container">
   <div class="row">
@@ -87,7 +86,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="col-md-6">
       <div class="card mt-4 shadow">
         <div class="card-header bg-secondary text-white">
@@ -106,7 +105,8 @@
                   </h5>
                   <p>{{ assignment.assignment }}</p>
                   <!-- View submission button -->
-                  <a href="/staff/view_submission/{{assignment.slug}}/" class="btn btn-secondary mt-2"><i class="fas fa-eye"></i> View Submissions</a>
+                  <a href="/staff/view_submission/{{assignment.slug}}/" class="btn btn-secondary mt-2"><i
+                      class="fas fa-eye"></i> View Submissions</a>
                 </div>
                 <div class="col-md-3">
                   <div class="assignment-details">
@@ -125,7 +125,6 @@
         </div>
       </div>
     </div>
-    
   </div>
 </div>
 {% endblock %}
