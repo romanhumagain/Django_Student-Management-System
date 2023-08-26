@@ -5,21 +5,21 @@
 <link rel="stylesheet" href="{% static 'css/registration.css' %}">
 {% block css %}
 <style>
-.title {
-  background-color: #0cb1af;
-  text-align: center;
-  color: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease 0s;
-}
+  .title {
+    background-color: #0cb1af;
+    text-align: center;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+  }
 
-.title:hover {
-  background-color: #1a9793;
-  box-shadow: 0px 15px 20px rgba(91, 208, 161, 0.4);
-  color: #fff;
-  transform: translateY(-7px);
-}
+  .title:hover {
+    background-color: #1a9793;
+    box-shadow: 0px 15px 20px rgba(91, 208, 161, 0.4);
+    color: #fff;
+    transform: translateY(-7px);
+  }
 </style>
 {% endblock%}
 {% block body %}
@@ -35,29 +35,29 @@
 </div>
 
 <div class="container center d-flex align-items-center justify-content-center">
-    <form class="card shadow-lg p-4 m-1" style="width: 500px;" method="post">
-        {% csrf_token %}
-        <!-- <h2 class="text-center mb-3"><i class="fas fa-user-plus"></i> Student Registration</h2> -->
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="fas fa-user"></i></span>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-            <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="fas fa-phone"></i></span>
-            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-            <input type="date" class="form-control" id="dob" name="dob" placeholder="Date of Birth" required>
-        </div>
-        <div class="input-group mb-3">
-            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-            <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address" required></textarea>
-        </div>
+  <form class="card shadow-lg p-4 m-1" style="width: 500px;" method="post">
+    {% csrf_token %}
+    <!-- <h2 class="text-center mb-3"><i class="fas fa-user-plus"></i> Student Registration</h2> -->
+    <div class="input-group mb-3">
+      <span class="input-group-text"><i class="fas fa-user"></i></span>
+      <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text"><i class="fas fa-phone"></i></span>
+      <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone" required>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+      <input type="date" class="form-control" id="dob" name="dob" placeholder="Date of Birth" required>
+    </div>
+    <div class="input-group mb-3">
+      <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+      <textarea class="form-control" id="address" name="address" rows="3" placeholder="Address" required></textarea>
+    </div>
     <select class="form-select mb-2" aria-label="Default select example" name="level" id="level">
       <option selected>Level</option>
       <option value="Level 4">Level 4</option>

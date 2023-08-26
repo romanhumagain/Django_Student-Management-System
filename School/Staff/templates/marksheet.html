@@ -13,9 +13,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
         integrity="sha512-...your-integrity-hash-here..." crossorigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
-  
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+</head>
 <style>
     .container {
         max-width: 800px;
@@ -88,67 +88,68 @@
                 </ul>
             </div>
         </div>
-    </nav>      
-      {% for result in results %}
-      <h2>{{result.exam.exam}}</h2>
-      {% if result.rank != None %}
-      <div class="certificate-container mb-2">
+    </nav>
+    {% for result in results %}
+    <h2>{{result.exam.exam}}</h2>
+    {% if result.rank != None %}
+    <div class="certificate-container mb-2">
         <div class="certificate-header">
-          <h2>Certificate of Achievement</h2>
-          <h3>{{result.exam.exam}}</h3>
+            <h2>Certificate of Achievement</h2>
+            <h3>{{result.exam.exam}}</h3>
         </div>
 
         <div class="certificate-body">
-          <p>This is to certify that <strong>Mr. {{ student.name }}</strong> has successfully completed the
-            {{result.exam.exam }} held on {{result.exam.date}}.</p>
+            <p>This is to certify that <strong>Mr. {{ student.name }}</strong> has successfully completed the
+                {{result.exam.exam }} held on {{result.exam.date}}.</p>
 
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th>Marks</th>
-                <th>Remarks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for subject_mark in result.subjectMarks %}
-              <tr>
-                <td>{{ subject_mark.subject.sub_name }}</td>
-                <td>{{ subject_mark.marks }}</td>
-                <td>
-                  {% if subject_mark.marks >= 40 %}
-                  <div style="color: rgb(11, 116, 130)">Pass</div>
-                  {% else %}
-                  <div style="color: red">Fail</div>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Marks</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject_mark in result.subjectMarks %}
+                    <tr>
+                        <td>{{ subject_mark.subject.sub_name }}</td>
+                        <td>{{ subject_mark.marks }}</td>
+                        <td>
+                            {% if subject_mark.marks >= 40 %}
+                            <div style="color: rgb(11, 116, 130)">Pass</div>
+                            {% else %}
+                            <div style="color: red">Fail</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-          <p><strong>Total Marks:</strong> {{ result.total_marks }}</p>
-          <p><strong>Percentage:</strong> {{ result.percentage|floatformat:1 }} %</p>
-          <p><strong>Rank: {{ result.rank }}</strong></p>
+            <p><strong>Total Marks:</strong> {{ result.total_marks }}</p>
+            <p><strong>Percentage:</strong> {{ result.percentage|floatformat:1 }} %</p>
+            <p><strong>Rank: {{ result.rank }}</strong></p>
         </div>
 
         <div class="certificate-signature">
-          <div>
-              <div style="font-family: 'Great Vibes', cursive; font-size: 2em;">{{ first_name }}</div>
-              <p>Signature of Student</p>
-          </div>
-          <div>
-              <img src="{% static 'images/sign.png' %}" alt="Signature">
-              <p>Signature of Principal</p>
-          </div>
-      </div>
-      
-      </div>
-      {% endif %}
-      {% if result.rank == None %}
-      <div class="alert alert-danger" style="max-width: 800px; margin-left: 360px; text-align: center;"><strong>Result Not Published For {{result.exam.exam}}</strong></div>
-      {% endif %}
-      {% endfor %}
+            <div>
+                <div style="font-family: 'Great Vibes', cursive; font-size: 2em;">{{ first_name }}</div>
+                <p>Signature of Student</p>
+            </div>
+            <div>
+                <img src="{% static 'images/sign.png' %}" alt="Signature">
+                <p>Signature of Principal</p>
+            </div>
+        </div>
+
+    </div>
+    {% endif %}
+    {% if result.rank == None %}
+    <div class="alert alert-danger" style="max-width: 800px; margin-left: 360px; text-align: center;"><strong>Result Not
+            Published For {{result.exam.exam}}</strong></div>
+    {% endif %}
+    {% endfor %}
     <footer style="margin-top: 20px;">
         <p>&copy; 2023 Designed and Built by Roman Humagain</p>
     </footer>

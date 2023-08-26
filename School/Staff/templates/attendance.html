@@ -6,20 +6,20 @@
 {% block css %}
 <style>
   .title {
-  background-color: #0cb1af;
-  text-align: center;
-  color: #fff;
-  border-radius: 10px;
-  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease 0s;
-}
+    background-color: #0cb1af;
+    text-align: center;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+  }
 
-.title:hover {
-  background-color: #1a9793;
-  box-shadow: 0px 15px 20px rgba(91, 208, 161, 0.4);
-  color: #fff;
-  transform: translateY(-7px);
-}
+  .title:hover {
+    background-color: #1a9793;
+    box-shadow: 0px 15px 20px rgba(91, 208, 161, 0.4);
+    color: #fff;
+    transform: translateY(-7px);
+  }
 </style>
 {% endblock %}
 {% block search %}
@@ -44,79 +44,83 @@
   </div>
   <form method="POST" style="margin-bottom: 50px;">
     {% csrf_token %}
-    
+
     <div class="card m-2 shadow-lg" style="width: 400px;">
       <div class="card-body">
         <h5 class="card-title"><i class="fas fa-book"></i> Select Course</h5>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="course" id="bsc" value="BSC Hons">
-                  <label class="form-check-label" for="bsc">
-                      BSC
-                  </label>
-              </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="course" id="bba" value="BBA Hons">
-                    <label class="form-check-label" for="bba">
-                        BBA
-                    </label>
-                </div>
-            </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="course" id="bsc" value="BSC Hons">
+          <label class="form-check-label" for="bsc">
+            BSC
+          </label>
         </div>
-        <div class="card m-2 shadow-lg" style="width: 400px;">
-            <div class="card-body">
-              <h5 class="card-title"><i class="fas fa-layer-group"></i> Select Level</h5>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="level" id="l4" value="Level 4">
-                    <label class="form-check-label" for="l4">
-                        L-4
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="level" id="l5" value="Level 5">
-                    <label class="form-check-label" for="l5">
-                        L-5
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="level" id="l6" value="Level 6">
-                    <label class="form-check-label" for="l6">
-                        L-6
-                    </label>
-                </div>
-            </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="course" id="bba" value="BBA Hons">
+          <label class="form-check-label" for="bba">
+            BBA
+          </label>
         </div>
-        <button type="submit" name="action" value = "sort" class="btn btn-primary m-2"><i class="fas fa-user-check"></i> Take Attendance</button></form>
+      </div>
     </div>
-    {% if students %}
-    <hr>
-    <div class="container">
-      <form method="post">
-        {% csrf_token %}
-        <table class="table table-striped">
-          <thead >
-            <tr>
-              <th scope="col">S.N</th>
-              <th scope="col">Std ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Attendance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for student in students %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ student.student_id }}</td>
-              <td>{{ student.name }}</td>
-              <td>
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" name="attendance[]" value="{{ student.student_id }}" id="attendance_{{ student.student_id }}">
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-    <button type="submit" name="action" value = "attendance" class="btn btn-primary" style="margin-left:1080px;"><i class="fas fa-user-check"  ></i> Take Attendance</button>
+    <div class="card m-2 shadow-lg" style="width: 400px;">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-layer-group"></i> Select Level</h5>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="level" id="l4" value="Level 4">
+          <label class="form-check-label" for="l4">
+            L-4
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="level" id="l5" value="Level 5">
+          <label class="form-check-label" for="l5">
+            L-5
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="level" id="l6" value="Level 6">
+          <label class="form-check-label" for="l6">
+            L-6
+          </label>
+        </div>
+      </div>
+    </div>
+    <button type="submit" name="action" value="sort" class="btn btn-primary m-2"><i class="fas fa-user-check"></i> Take
+      Attendance</button>
+  </form>
+</div>
+{% if students %}
+<hr>
+<div class="container">
+  <form method="post">
+    {% csrf_token %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">S.N</th>
+          <th scope="col">Std ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Attendance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for student in students %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ student.student_id }}</td>
+          <td>{{ student.name }}</td>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="attendance[]" value="{{ student.student_id }}"
+                id="attendance_{{ student.student_id }}">
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <button type="submit" name="action" value="attendance" class="btn btn-primary" style="margin-left:1080px;"><i
+        class="fas fa-user-check"></i> Take Attendance</button>
   </form>
 </div>
 {% endif %}

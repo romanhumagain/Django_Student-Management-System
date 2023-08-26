@@ -13,7 +13,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from Staff.models import *
 
+from Home.faker import generate_student_data
+
+
 def index(request):
+    # generate_student_data(100)
+    
     if request.method == 'POST':
         data = request.POST
         email = data.get('email')
